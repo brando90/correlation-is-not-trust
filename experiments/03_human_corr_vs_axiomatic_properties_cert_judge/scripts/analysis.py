@@ -59,7 +59,14 @@ def read_json(path: Path) -> Any:
 
 
 def write_json(path: Path, obj: Any) -> None:
-    path.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(obj, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+
+
+def _parse_bounded_float(raw: Any, lo: float, hi: float, label: str) -> float:
+    val = float(raw)
+    if not math.isfinite(val) or val < lo - TOL or val > hi + TOL:
+        raise ValueError(f"Invalid {label}={raw!r}: expected finite value in [{lo}, {hi}]")
+    return val
 
 
 def spearman_corr(xs: list[float], ys: list[float]) -> float | None:
@@ -84,7 +91,10 @@ def cluster_mean_ci(
         return {"value": None, "ci_lo": None, "ci_hi": None, "n": 0, "n_tasks": 0}
     groups: dict[str, list[float]] = {}
     for task, val in pairs:
-        groups.setdefault(task, []).append(float(val))
+        fval = float(val)
+        if not math.isfinite(fval):
+            raise ValueError(f"Non-finite value in cluster_mean_ci for task={task!r}: {val!r}")
+        groups.setdefault(task, []).append(fval)
     keys = sorted(groups)
     point = sum(v for _, v in pairs) / len(pairs)
     rng = random.Random(seed)
@@ -145,10 +155,17 @@ def aggregate_harvest_scores(
 ) -> tuple[dict[tuple[str, str, int], float], dict[tuple[str, str, int], list[float]]]:
     """Group harvest cells into scored repeats and medians by (kind, key, level)."""
     raw_by_cell: dict[tuple[str, str, int], list[float]] = {}
-    for c in harvest["cells"]:
+    seen_repeats: set[tuple[str, str, int, Any]] = set()
+    for idx, c in enumerate(harvest["cells"]):
+        key_str = c.get("key") if c.get("key") is not None else c["task"]
+        rep_id = c["repeat"] if "repeat" in c else idx
+        rep_key = (c["kind"], str(key_str), int(c["level"]), rep_id)
+        if rep_key in seen_repeats:
+            raise ValueError(f"Duplicate harvest repeat key: {rep_key}")
+        seen_repeats.add(rep_key)
         if c.get("status") in SCORED_STATUSES and c.get("score") is not None:
-            key_str = c.get("key") if c.get("key") is not None else c["task"]
-            raw_by_cell.setdefault((c["kind"], str(key_str), int(c["level"])), []).append(float(c["score"]))
+            score_val = _parse_bounded_float(c["score"], 0.0, 1.0, "harvest score")
+            raw_by_cell.setdefault((c["kind"], str(key_str), int(c["level"])), []).append(score_val)
     medians: dict[tuple[str, str, int], float] = {}
     for cell_id, vals in raw_by_cell.items():
         req = min_repeats_by_kind.get(cell_id[0], default_min_repeats)
@@ -178,6 +195,8 @@ def summarize_paired_violation(
         probe_score = scores.get(probe_lookup(r))
         if base_score is None or probe_score is None:
             continue
+        if not (math.isfinite(base_score) and math.isfinite(probe_score)):
+            raise ValueError(f"Non-finite paired score for task={r.get('task')!r}: base={base_score!r}, probe={probe_score!r}")
         task = str(r["task"])
         raw_probe_pairs.append((task, probe_score))
         gap = abs(probe_score - base_score)
@@ -196,7 +215,7 @@ def summarize_paired_violation(
             raise ValueError(f"Unknown comparison mode: {mode}")
 
     coverage = len(viol_pairs) / declared if declared else 0.0
-    computable = coverage + 1e-9 >= min_coverage and declared > 0
+    computable = len(viol_pairs) > 0 and coverage + 1e-9 >= min_coverage and declared > 0
     ci = cluster_mean_ci(viol_pairs) if viol_pairs else cluster_mean_ci([])
     out: dict[str, Any] = {
         "value": ci["value"] if computable else None,
@@ -390,7 +409,9 @@ def analyze_judges(e39_dir: Path, e42_dir: Path) -> dict[str, Any]:
                 raise RuntimeError(f"Computable mismatch for {cfg} {fam}: {prop['computable']} vs {m42['computable']}")
             if prop["computable"]:
                 recomputed_acc = 1.0 - prop["value"]
-                diff = abs(recomputed_acc - m42["value"])
+                diff = abs(recomputed_acc - float(m42["value"]))
+                if not math.isfinite(diff):
+                    raise RuntimeError(f"Non-finite alignment diff for {cfg} {fam}: {diff!r}")
                 max_align_diff = max(max_align_diff, diff)
                 align_checks += 1
                 if diff > 1e-9 or prop["n_scored"] != m42["n"]:
@@ -399,7 +420,9 @@ def analyze_judges(e39_dir: Path, e42_dir: Path) -> dict[str, Any]:
         if v_fmt["computable"] != m42_fmt["computable"]:
             raise RuntimeError(f"Computable mismatch for {cfg} formatting")
         if v_fmt["computable"]:
-            diff = abs(v_fmt["mean_abs_gap"] - m42_fmt["value"])
+            diff = abs(v_fmt["mean_abs_gap"] - float(m42_fmt["value"]))
+            if not math.isfinite(diff):
+                raise RuntimeError(f"Non-finite alignment diff for {cfg} formatting: {diff!r}")
             max_align_diff = max(max_align_diff, diff)
             align_checks += 1
             if diff > 1e-9 or v_fmt["n_scored"] != m42_fmt["n"]:
@@ -487,7 +510,10 @@ def analyze_judges(e39_dir: Path, e42_dir: Path) -> dict[str, Any]:
         if not r["V_fmt"]["computable"] or r["V_fmt"]["mean_abs_gap"] > 0.05:
             all_clean = False
 
-    h1_verdict = "SUPPORTED" if failing_high_corr else ("FALSIFIED" if all_clean else "MIXED")
+    h1_verdict = "SUPPORTED" if failing_high_corr else ("INCONCLUSIVE" if not high_corr_llms else ("FALSIFIED" if all_clean else "MIXED"))
+
+    if align_checks == 0 or not math.isfinite(max_align_diff) or max_align_diff > 1e-9:
+        raise RuntimeError(f"E42 alignment check failed: checks={align_checks}, max_abs_diff={max_align_diff}")
 
     return {
         "alignment_check": {"checks": align_checks, "max_abs_diff": max_align_diff, "passed": max_align_diff <= 1e-9},
@@ -506,12 +532,17 @@ def analyze_judges(e39_dir: Path, e42_dir: Path) -> dict[str, Any]:
 
 def load_tsv_ratings(path: Path) -> dict[tuple[str, str], float]:
     out: dict[tuple[str, str], float] = {}
+    seen_keys: set[tuple[str, str]] = set()
     with path.open("r", encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f, delimiter="\t"):
+            key = (row["gold_file"].strip(), row["candidate_file"].strip())
+            if key in seen_keys:
+                raise ValueError(f"Duplicate item key in {path.name}: {key}")
+            seen_keys.add(key)
             raw = (row.get("human_score_0_5") or "").strip()
-            if raw == "" or raw.upper() == "NA" or raw.lower() == "nan":
+            if raw == "" or raw.upper() == "NA":
                 continue
-            out[(row["gold_file"].strip(), row["candidate_file"].strip())] = float(raw)
+            out[key] = _parse_bounded_float(raw, 0.0, 5.0, f"{path.name} human_score_0_5")
     return out
 
 
@@ -615,7 +646,8 @@ def compute_item_spread_stats(
 
     eligible_keys = [k for k in all_items if k in item_vals]
     point = summarize_keys(eligible_keys)
-    assert point is not None
+    if point is None:
+        raise ValueError(f"No items satisfy min_raters={min_raters}")
     hist_counts = {str(d): sum(1 for k in eligible_keys if int(round(max(item_vals[k]) - min(item_vals[k]))) == d) for d in range(6)}
 
     task_names = sorted(by_task)
@@ -949,7 +981,7 @@ def make_figures(out_dir: Path, jres: dict[str, Any], hres: dict[str, Any]) -> N
     handles, labels = axes.flat[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper center", ncol=3, bbox_to_anchor=(0.5, 0.955), frameon=True, fontsize=9)
     fig.suptitle(
-        "Exp 03 (2026-11-24): Lean 4 judges with high human correlation still fail axiomatic checks",
+        "Exp 03 (11-24-2026): Lean 4 judge configurations with high human correlation still fail axiomatic checks",
         fontsize=13,
         fontweight="bold",
         y=0.99,
@@ -1013,7 +1045,7 @@ def make_figures(out_dir: Path, jres: dict[str, Any], hres: dict[str, Any]) -> N
     ax2.set_title("Cross-rater score spread across 5 fixed-rubric raters", fontsize=11, fontweight="bold")
 
     fig.suptitle(
-        "Exp 03 (2026-11-24): Lean 4 human raters show low exact agreement and wide score spreads",
+        "Exp 03 (11-24-2026): Lean 4 human raters show low exact agreement and wide score spreads",
         fontsize=12.5,
         fontweight="bold",
         y=0.98,

@@ -1,6 +1,8 @@
-# Experiment 03: Human correlation vs. axiomatic properties (`cert-judge` E39/E42 + Lean 4 human pool) (date: 2026-11-24)
+# Experiment 03: Human correlation vs. axiomatic properties (`cert-judge` E39/E42 + Lean 4 human pool) (date: 11-24-2026)
 
-Zero-model-call reanalysis testing **H1** (whether high human-correlation Lean 4 judges still violate basic axiomatic properties) and **H2** (how inconsistent human raters are on the exact same Lean 4 tasks, both across raters and across passes/rubric wording).
+Date: `11-24-2026`
+
+Zero-model-call reanalysis testing **H1** (whether Lean 4 judge configurations — `50` judge LLMs and `6` judge agents — with high held-out Spearman correlation to the `3`-expert VeriBench `target_expert` panel still violate basic axiomatic properties) and **H2** (cross-rater disagreement across `5` independent fixed-rubric participant raters and within-annotator strictness/rubric-wording sensitivity on the exact same Lean 4 tasks).
 
 - **Protocol:** [PREREG.md](PREREG.md) (committed at [`b571a7d`](https://github.com/brando90/correlation-is-not-trust/commit/b571a7d7ef8872d3ba1a53ed4d02e5746dbcd934) prior to running)
 - **Results:** [RESULTS.md](RESULTS.md)
