@@ -43,11 +43,29 @@ def wspear(x, y, tasks, w):
     return float(spearmanr(xs, ys)[0])
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--probes", required=True); ap.add_argument("--scores", nargs="+", required=True); ap.add_argument("--out", required=True)
+    ap = argparse.ArgumentParser(); ap.add_argument("--probes", required=True); ap.add_argument("--scores", nargs="+", required=True); ap.add_argument("--out", required=True); ap.add_argument("--items", required=True, help="VeriBench items.jsonl with p1..p5 (private, not committed)")
     a = ap.parse_args(); out = Path(a.out); out.mkdir(exist_ok=True, parents=True)
     probes = {}
     for l in open(a.probes):
         r = json.loads(l); probes[r["probe_id"]] = r
+    hum = {}
+    for l in open(a.items):
+        it = json.loads(l); cnt = np.zeros(6)
+        for k in ("p1", "p2", "p3", "p4", "p5"):
+            v = it.get(k)
+            try:
+                v = float(v)
+                if v == v: cnt[int(round(v))] += 1
+            except (TypeError, ValueError): pass
+        hum["CRIT__" + it["item"]] = cnt / cnt.sum() if cnt.sum() else None
+    pooled = np.mean([q for q in hum.values() if q is not None], axis=0); unif = np.ones(6) / 6
+    def rps(p, q): return float(np.mean((np.cumsum(p)[:5] - np.cumsum(q)[:5]) ** 2))
+    def tvd(p, q): return float(0.5 * np.abs(p - q).sum())
+    def ce(p, q): return float(-(q * np.log(np.clip(p, 1e-12, None))).sum())
+    def point(s_): 
+        p = np.full(6, 0.1 / 6); p[int(min(5, max(0, np.floor(5 * s_ + 0.5))))] += 0.9; return p
+    def point_raw(s_):
+        p = np.zeros(6); p[int(min(5, max(0, np.floor(5 * s_ + 0.5))))] = 1.0; return p
     summary = {}
     for sp in a.scores:
         cfg = Path(sp).stem.replace("scores_", "")
@@ -67,6 +85,21 @@ def main():
             pt = wspear(x, y, tasks, {t: 1 for t in tasks})
             ci = cluster_ci(tasks, lambda w, y=y: wspear(x, y, tasks, w), rng)
             res[f"rho_{tgt}"] = dict(value=pt, ci=ci, n=len(crit), distinct_scores=len(set(x)))
+        # headline: RPS, TVD, CE vs the human rating distribution
+        ids = [pid for pid, _ in crit if hum.get(pid) is not None]
+        tk2 = [probes[pid]["task"] for pid in ids]
+        M = {}
+        for name, fp in (("judge", lambda s_: point_raw(s_)), ("constant", lambda s_: pooled), ("uniform", lambda s_: unif)):
+            M[name] = dict(rps=[rps(fp(kinds["CRIT"][pid]), hum[pid]) for pid in ids], tvd=[tvd(fp(kinds["CRIT"][pid]), hum[pid]) for pid in ids])
+        M["judge"]["ce"] = [ce(point(kinds["CRIT"][pid]), hum[pid]) for pid in ids]
+        M["constant"]["ce"] = [ce(pooled, hum[pid]) for pid in ids]; M["uniform"]["ce"] = [ce(unif, hum[pid]) for pid in ids]
+        head = dict(n_items=len(ids))
+        for name in M:
+            head[name] = {m: dict(value=float(np.mean(v)), ci=cluster_ci(tk2, lambda w, v=v: wmean(v, tk2, w), rng)) for m, v in M[name].items()}
+        head["judge_minus_constant"] = {m: dict(value=float(np.mean(np.array(M["judge"][m]) - np.array(M["constant"][m]))),
+                                                ci=cluster_ci(tk2, lambda w, m=m: wmean(list(np.array(M["judge"][m]) - np.array(M["constant"][m])), tk2, w), rng)) for m in ("rps", "tvd", "ce")}
+        res["headline"] = head
+        res["rps_significant"] = bool(head["judge_minus_constant"]["rps"]["ci"][1] is not None and head["judge_minus_constant"]["rps"]["ci"][1] < 0)
         # ID
         id1 = {probes[pid]["task"]: s for pid, s in kinds["ID1"].items()}
         id2 = {probes[pid]["task"]: s for pid, s in kinds["ID2"].items()}
@@ -104,7 +137,7 @@ def main():
                                         for l in sorted(set(probes[pid]["level"] for pid, _ in pr))})
         # verdict pieces
         rho = res["rho_target_expert"]
-        res["rho_significant"] = bool(rho["ci"][0] is not None and rho["ci"][0] > 0)
+        res["rho_significant"] = bool(rho["ci"][0] is not None and rho["ci"][0] > 0)  # secondary reading
         summary[cfg] = res
         with open(out / f"scores_{cfg}.csv", "w", newline="") as f:
             w = csv.writer(f); w.writerow(["probe_id", "kind", "task", "level", "score"])
@@ -113,15 +146,19 @@ def main():
     json.dump(summary, open(out / "summary.json", "w"), indent=1)
     # figures (grid on)
     cfgs = list(summary)
-    fig, ax = plt.subplots(1, 3, figsize=(13, 4))
+    fig, ax = plt.subplots(1, 4, figsize=(17, 4))
     for i, c in enumerate(cfgs):
-        s = summary[c]; r = s["rho_target_expert"]
-        ax[0].errorbar(i, r["value"], yerr=[[r["value"] - r["ci"][0]], [r["ci"][1] - r["value"]]], fmt="o", capsize=4)
-        if s.get("RN"): ax[1].errorbar(i, s["RN"]["share"], yerr=[[s["RN"]["share"] - s["RN"]["share_ci"][0]], [s["RN"]["share_ci"][1] - s["RN"]["share"]]], fmt="o", capsize=4)
-        ax[1].errorbar(i + 0.3, s["noise"]["share"], yerr=[[s["noise"]["share"] - s["noise"]["share_ci"][0]], [s["noise"]["share_ci"][1] - s["noise"]["share"]]], fmt="s", capsize=4, color="gray")
-        if s.get("BUG"): ax[2].errorbar(i, s["BUG"]["V_bug"], yerr=[[s["BUG"]["V_bug"] - s["BUG"]["V_bug_ci"][0]], [s["BUG"]["V_bug_ci"][1] - s["BUG"]["V_bug"]]], fmt="o", capsize=4)
-    for a_, t in zip(ax, ["Spearman with human expert target (95% CI)", "Rename: share |score change| > 0.05 (circle) vs repeat noise (gray square)", "Bug scored >= original (share, 95% CI)"]):
-        a_.set_title(t, fontsize=8); a_.set_xticks(range(len(cfgs))); a_.set_xticklabels(cfgs); a_.grid(True)
+        s = summary[c]; h = s["headline"]
+        for j, (nm, col) in enumerate((("judge", "C0"), ("constant", "gray"), ("uniform", "C3"))):
+            v = h[nm]["rps"]; ax[0].errorbar(i + 0.2 * j, v["value"], yerr=[[v["value"] - v["ci"][0]], [v["ci"][1] - v["value"]]], fmt="o", capsize=4, color=col, label=nm if i == 0 else None)
+            v = h[nm]["tvd"]; ax[1].errorbar(i + 0.2 * j, v["value"], yerr=[[v["value"] - v["ci"][0]], [v["ci"][1] - v["value"]]], fmt="o", capsize=4, color=col)
+        if s.get("RN"): ax[2].errorbar(i, s["RN"]["share"], yerr=[[s["RN"]["share"] - s["RN"]["share_ci"][0]], [s["RN"]["share_ci"][1] - s["RN"]["share"]]], fmt="o", capsize=4, label="rename" if i == 0 else None)
+        ax[2].errorbar(i + 0.3, s["noise"]["share"], yerr=[[s["noise"]["share"] - s["noise"]["share_ci"][0]], [s["noise"]["share_ci"][1] - s["noise"]["share"]]], fmt="s", capsize=4, color="gray", label="repeat noise" if i == 0 else None)
+        if s.get("BUG"): ax[3].errorbar(i, s["BUG"]["V_bug"], yerr=[[s["BUG"]["V_bug"] - s["BUG"]["V_bug_ci"][0]], [s["BUG"]["V_bug_ci"][1] - s["BUG"]["V_bug"]]], fmt="o", capsize=4)
+    for a_, t in zip(ax, ["RPS vs human ratings (lower is better)", "TVD vs human ratings (lower is better)", "Rename: share of |score change| > 0.05", "Bug scored >= original (share)"]):
+        a_.set_title(t, fontsize=9); a_.set_xticks(range(len(cfgs))); a_.set_xticklabels(cfgs); a_.grid(True)
+    ax[0].legend(fontsize=7); ax[2].legend(fontsize=7)
+    fig.suptitle("Experiment 05 (as of 2026-11-24): 95% task-cluster intervals", fontsize=9)
     plt.tight_layout(); plt.savefig(out / "fig_properties.png", dpi=150)
     print(json.dumps(summary, indent=1)[:3000])
 main()

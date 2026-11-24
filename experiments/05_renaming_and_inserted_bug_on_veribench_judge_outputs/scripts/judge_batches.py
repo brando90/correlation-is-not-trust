@@ -7,7 +7,8 @@ import argparse, collections, json, os, random, re, subprocess, sys, time
 from pathlib import Path
 
 ALL_LANES = "vals-codex,vals-claude-opus,stanford-codex,stanford-claude,pi:stanford-stair-bm,sundial,pi:koyejolab-openai-bm,native:cursor,native:grok,pi:vals-openai-bm,personal-codex,personal-claude,pi:allen-google-veribench".split(",")
-RUBRIC_FILE = Path("/lfs/skampere1/0/brando9/cert-judge_e39/experiments/39_label_free_proxy_index_train_val_test_over_judge_families/prompts/P4_CHECKLIST.txt")
+PROMPT_DIR = Path("/lfs/skampere1/0/brando9/cert-judge_e39/experiments/39_label_free_proxy_index_train_val_test_over_judge_families/prompts")
+RUBRIC_FILE = PROMPT_DIR / "P4_CHECKLIST.txt"   # default; --rubric P8_STRICT_B selects the other one
 K, SEED = 6, 20261124
 
 def make_batches(rows):
@@ -67,7 +68,7 @@ def parse_scores(texts, n):
 def call(prompt_path, ws, skip):
     p = subprocess.run(["plan-rr", "--experiment", "--prompt-file", str(prompt_path), "--workspace", str(ws), "--skip", skip],
                        capture_output=True, text=True, timeout=900)
-    ran = re.search(r"plan-rr: ran (\S+)", p.stdout)
+    ran = re.search(r"plan-rr: ran (\S+)", p.stdout + p.stderr)
     receipt = None
     for line in p.stdout.splitlines():
         if line.startswith("{"):
@@ -77,13 +78,15 @@ def call(prompt_path, ws, skip):
     if receipt and receipt.get("logs"):
         f = Path(receipt["logs"]) / "stdout"
         if f.exists(): stdout = f.read_text()
-    return p.returncode, (ran.group(1) if ran else None), receipt, stdout, p.stdout[-400:]
+    lane = ran.group(1) if ran else (receipt or {}).get("plan")
+    return p.returncode, lane, receipt, stdout, (p.stdout + p.stderr)[-400:]
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--probes", required=True); ap.add_argument("--config", required=True)
-    ap.add_argument("--lanes", required=True); ap.add_argument("--out", required=True); ap.add_argument("--max-batches", type=int, default=10**9)
+    ap.add_argument("--lanes", required=True); ap.add_argument("--out", required=True); ap.add_argument("--max-batches", type=int, default=10**9); ap.add_argument("--rubric", default="P4_CHECKLIST")
     a = ap.parse_args()
+    global RUBRIC_FILE; RUBRIC_FILE = PROMPT_DIR / f"{a.rubric}.txt"
     out = Path(a.out).expanduser(); ws = out / "ws"; ws.mkdir(parents=True, exist_ok=True)
     os.environ["PATH"] = "/dfs/scratch0/brando9/bin:" + os.path.expanduser("~/.local/bin") + ":" + os.environ["PATH"]
     rows = [json.loads(l) for l in open(Path(a.probes).expanduser())]
