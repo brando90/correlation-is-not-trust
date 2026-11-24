@@ -11,6 +11,8 @@ H1: A judge or metric can correlate highly with human judgments and still violat
 Metrics compared: judge LLMs, judge agents, human labels, pass@k, boxed accuracy, gold-reference tests.
 
 ## Source
+Slides "Certifying the Formal Judge" (https://docs.google.com/presentation/d/1ZYCAQ5gGwmjaipT2nNRTe-mEYxOtgpiLqGogbrgP_Hc/edit?slide=id.g3e67486055a_0_29#slide=id.g3e67486055a_0_29), slide 2. Details: docs/PROJECT_IDEA.md. Deck: [Certifying the Formal Judge](https://docs.google.com/presentation/d/1ZYCAQ5gGwmjaipT2nNRTe-mEYxOtgpiLqGogbrgP_Hc/edit?slide=id.p#slide=id.p), see slide 2.
+
 Slides "Certifying the Formal Judge", slide 2 (Yegor's critique: "strict prerequisite", "spurious proxy"): Idea 1 human judgments are not sufficient to establish trust in judges, foundational stability properties are needed too (the one Brando likes most); Idea 2 properties as a cheaper alternative to humans; Idea 3 calibrate once, deploy forever.
 
 ## Layout
