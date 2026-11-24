@@ -69,3 +69,8 @@ Source: `cert-judge/experiments/human_labels/` (read-only off-repo; scores on 0â
 
 ## Cost estimate
 $0.00 (zero new model calls; no tokens spent on any account).
+
+## Amendment (2026-11-24, post-Light QA)
+1. **Observed-cluster human bootstrap support:** When resampling task clusters for a human comparison in Part B (`bootstrap_pair_metrics`, `summary_10_pairs`, `loro_summary`), each comparison resamples only its own observed task clusters (`25` tasks for the 5-rater pool and `P1_old_pass1` vs `P1_old_pass2`; `15` for pairs involving `P3`; `24` for `P1_correct` vs `P2/P4/P5`; `21` for exact-key `P1_correct` vs `old_prompt` overlaps), rather than resampling a union of mismatched filename aliases across files.
+2. **Scope qualification for `V_bug`:** Because `E39` `bm_gold` mutates executable `def` implementations while `H0`/`H1`/`H2`/`R4`/`D0` score formal theorem-statement coverage (and compilation does not prove semantic spec loss), we additionally report `H1` sensitivity restricted strictly to theorem-statement weakening (`V_weak`) and repeat inconsistency (`V_rep`). Both `22/22` high-correlation judges (`rho_heldout >= 0.70`) still trigger `H1` without `V_bug`.
+3. **Seed & dependence notes:** Both bootstrap and cross-configuration permutation routines use seed `20261124`; cross-configuration correlations across the `56` real judge units are conditional/exploratory because configurations share models, prompts, and tasks.
