@@ -1,6 +1,7 @@
 # Repo rules (as of 2026-11-24)
 
-Project: correlation-is-not-trust. Read README.md and docs/PROJECT_IDEA.md first.
+Project: correlation-is-not-trust (README title: do AI judges that correlate highly with humans still fail trustworthy judge properties?). Read README.md and docs/PROJECT_IDEA.md first.
+Sibling repo, different question: brando90/judges-dont-need-psychometrics-or-corr is correlation vs CE (which objective to train judges on). This repo is bad judge properties despite high correlation. Do not mix their experiments.
 
 - Commit straight to main. No branches, no open PRs, no issues. Keep main current: pull before work, push when done, print the commit link.
 - Every experiment is a numbered folder experiments/NN_<name>/ with README.md, PREREG.md (committed before any run), scripts, results, RESULTS.md. Start from experiments/00_template/PREREG.md. Index in experiments/README.md, newest first.
