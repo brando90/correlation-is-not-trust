@@ -130,6 +130,7 @@ def main():
             tk = [probes[pid]["task"] for pid, _ in pr]; base = [id1[t] for t in tk]; sv = [s for _, s in pr]
             ge = [float(s >= b - 1e-9) for s, b in zip(sv, base)]; gt = [float(s > b + 1e-9) for s, b in zip(sv, base)]
             res["BUG"] = dict(n=len(pr), V_bug=float(np.mean(ge)), V_bug_ci=cluster_ci(tk, lambda w: wmean(ge, tk, w), rng),
+                              V_bug_ID1_at_least_0p5=(lambda m: dict(n=int(sum(m)), V_bug=float(np.mean([g for g, k in zip(ge, m) if k])) if any(m) else None))([b >= 0.5 for b in base]),
                               strict_share=float(np.mean(gt)), tie_share=float(np.mean(ge) - np.mean(gt)),
                               mean_drop=float(np.mean(np.array(base) - np.array(sv))),
                               by_level={str(l): dict(n=sum(1 for pid, _ in pr if probes[pid]["level"] == l),
