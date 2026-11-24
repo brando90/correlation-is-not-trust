@@ -30,3 +30,6 @@ None. Python 3 with numpy and scipy, script analysis.py in this folder.
 
 ## Cost estimate
 $0 (no model calls, no tokens on any account).
+
+## Amendment 2026-11-24 (written after the first run of analysis.py, flagged as post-run)
+The first run showed two things the plan did not foresee. (1) Some raters gave the same label to all 350 items, so their Pearson correlation is undefined; they are left out of the Pearson summaries and counted in results.json (`n_raters_with_constant_labels`). (2) Rounding the item mean to the nearest of {No, Unsure, Yes} produces "Unsure" for many items although only a few percent of ratings are Unsure, so the pre-registered E4a label agreement (0.40) is an artifact of the rounding, not of rater noise. We keep it in the table as pre-registered and add a binary variant: the oracle says Yes if the share of Yes among the other raters is larger than the share of No, else No, scored against the single rater's label on that rater's Yes/No ratings only (leave-self-out). The falsification rule is applied to the binary variant, and the verdict says so.
