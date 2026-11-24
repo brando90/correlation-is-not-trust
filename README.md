@@ -17,3 +17,15 @@ Slides "Certifying the Formal Judge", slide 2 (Yegor's critique: "strict prerequ
 
 ## Layout
 experiments/NN_name/ (numbered, dated, PREREG.md before any run), docs/, CLAUDE.md, AGENTS.md.
+
+## Citation (as of 2026-11-24)
+```bibtex
+@misc{miranda2026correlationisnottrust,
+  author = {Miranda, Brando and Koyejo, Sanmi},
+  title  = {Correlation is not trust: is fitting human judgments even a good target for a judge?},
+  year   = {2026},
+  note   = {Work in progress, started 2026-11-24},
+  url    = {https://github.com/brando90/correlation-is-not-trust}
+}
+```
+Brando Miranda, Sanmi Koyejo. Correlation is not trust: is fitting human judgments even a good target for a judge? 2026. https://github.com/brando90/correlation-is-not-trust
