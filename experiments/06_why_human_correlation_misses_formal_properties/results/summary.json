@@ -821,8 +821,8 @@
     "spearman_abs_diff": 0.0,
     "partial_rho_vweak_given_vbug": {
       "value": -0.7662739969416004,
-      "ci_lo": -0.8472180029410847,
-      "ci_hi": -0.6499370329777612,
+      "ci_lo": -0.8472180029410845,
+      "ci_hi": -0.6499370329777611,
       "p_val": 0.0001999600079984003,
       "n": 56,
       "n_tasks": 56,
@@ -830,9 +830,9 @@
       "valid_perm": 5000
     },
     "partial_rho_vbug_given_vweak": {
-      "value": 0.3018883550220626,
-      "ci_lo": 0.07563869622467244,
-      "ci_hi": 0.4778385783339177,
+      "value": 0.3018883550220627,
+      "ci_lo": 0.07563869622467252,
+      "ci_hi": 0.4778385783339176,
       "p_val": 0.02399520095980804,
       "n": 56,
       "n_tasks": 56,
@@ -1717,6 +1717,319 @@
     "overall": "mixed"
   },
   "arm_i": {
-    "status": "not_run"
+    "status": "scored",
+    "model_id": "claude-opus-5-5",
+    "lane": "vals-claude-opus",
+    "n_by_kind": {
+      "BUG": 37,
+      "ID1": 24,
+      "ID2": 24,
+      "RN_b": 14,
+      "RN_d": 24
+    },
+    "n_bug": 37,
+    "n_id1": 24,
+    "v_bug": {
+      "value": 0.10810810810810811,
+      "ci_lo": 0.0,
+      "ci_hi": 0.2593567251461983,
+      "n": 37,
+      "n_tasks": 11,
+      "valid_draws": 2000
+    },
+    "strict": {
+      "value": 0.0,
+      "ci_lo": 0.0,
+      "ci_hi": 0.0,
+      "n": 37,
+      "n_tasks": 11,
+      "valid_draws": 2000
+    },
+    "tie": {
+      "value": 0.10810810810810811,
+      "ci_lo": 0.0,
+      "ci_hi": 0.2593567251461983,
+      "n": 37,
+      "n_tasks": 11,
+      "valid_draws": 2000
+    },
+    "mean_drop": 0.491891891891892,
+    "mean_drop_ci": {
+      "value": 0.491891891891892,
+      "ci_lo": 0.347140756302521,
+      "ci_hi": 0.6204614745011086,
+      "n": 37,
+      "n_tasks": 11,
+      "valid_draws": 2000
+    },
+    "median_drop": {
+      "value": 0.6000000000000001,
+      "ci_lo": 0.14999999999999997,
+      "ci_hi": 0.7250000000000001,
+      "n": 37,
+      "n_tasks": 11,
+      "valid_draws": 2000
+    },
+    "material_drop_gt_0_20": {
+      "value": 0.6216216216216216,
+      "ci_lo": 0.4375,
+      "ci_hi": 0.7857142857142857,
+      "n": 37,
+      "n_tasks": 11,
+      "valid_draws": 2000
+    },
+    "n_class": {
+      "ceiling_tie": 5,
+      "mid_tie": 0,
+      "floor_tie": 0,
+      "penalized": 32,
+      "inversion": 0
+    },
+    "classes": {
+      "ceiling_tie": {
+        "value": 0.13513513513513514,
+        "ci_lo": 0.0,
+        "ci_hi": 0.30303030303030304,
+        "n": 37,
+        "n_tasks": 11,
+        "valid_draws": 2000
+      },
+      "mid_tie": {
+        "value": 0.0,
+        "ci_lo": 0.0,
+        "ci_hi": 0.0,
+        "n": 37,
+        "n_tasks": 11,
+        "valid_draws": 2000
+      },
+      "floor_tie": {
+        "value": 0.0,
+        "ci_lo": 0.0,
+        "ci_hi": 0.0,
+        "n": 37,
+        "n_tasks": 11,
+        "valid_draws": 2000
+      },
+      "penalized": {
+        "value": 0.8648648648648649,
+        "ci_lo": 0.696969696969697,
+        "ci_hi": 1.0,
+        "n": 37,
+        "n_tasks": 11,
+        "valid_draws": 2000
+      },
+      "inversion": {
+        "value": 0.0,
+        "ci_lo": 0.0,
+        "ci_hi": 0.0,
+        "n": 37,
+        "n_tasks": 11,
+        "valid_draws": 2000
+      }
+    },
+    "by_level": {
+      "1": {
+        "v_bug": {
+          "value": 0.18181818181818182,
+          "ci_lo": 0.0,
+          "ci_hi": 0.45454545454545453,
+          "n": 11,
+          "n_tasks": 11,
+          "valid_draws": 2000
+        },
+        "material": {
+          "value": 0.36363636363636365,
+          "ci_lo": 0.09090909090909091,
+          "ci_hi": 0.6363636363636364,
+          "n": 11,
+          "n_tasks": 11,
+          "valid_draws": 2000
+        },
+        "mean_drop": {
+          "value": 0.29545454545454547,
+          "ci_lo": 0.1409090909090909,
+          "ci_hi": 0.4681818181818182,
+          "n": 11,
+          "n_tasks": 11,
+          "valid_draws": 2000
+        }
+      },
+      "2": {
+        "v_bug": {
+          "value": 0.1111111111111111,
+          "ci_lo": 0.0,
+          "ci_hi": 0.3333333333333333,
+          "n": 9,
+          "n_tasks": 9,
+          "valid_draws": 2000
+        },
+        "material": {
+          "value": 0.6666666666666666,
+          "ci_lo": 0.3333333333333333,
+          "ci_hi": 0.8888888888888888,
+          "n": 9,
+          "n_tasks": 9,
+          "valid_draws": 2000
+        },
+        "mean_drop": {
+          "value": 0.49444444444444446,
+          "ci_lo": 0.2666666666666667,
+          "ci_hi": 0.6944444444444444,
+          "n": 9,
+          "n_tasks": 9,
+          "valid_draws": 2000
+        }
+      },
+      "3": {
+        "v_bug": {
+          "value": 0.0,
+          "ci_lo": 0.0,
+          "ci_hi": 0.0,
+          "n": 9,
+          "n_tasks": 9,
+          "valid_draws": 2000
+        },
+        "material": {
+          "value": 0.7777777777777778,
+          "ci_lo": 0.4444444444444444,
+          "ci_hi": 1.0,
+          "n": 9,
+          "n_tasks": 9,
+          "valid_draws": 2000
+        },
+        "mean_drop": {
+          "value": 0.6444444444444444,
+          "ci_lo": 0.4444444444444444,
+          "ci_hi": 0.8166666666666668,
+          "n": 9,
+          "n_tasks": 9,
+          "valid_draws": 2000
+        }
+      },
+      "4": {
+        "v_bug": {
+          "value": 0.125,
+          "ci_lo": 0.0,
+          "ci_hi": 0.375,
+          "n": 8,
+          "n_tasks": 8,
+          "valid_draws": 2000
+        },
+        "material": {
+          "value": 0.75,
+          "ci_lo": 0.375,
+          "ci_hi": 1.0,
+          "n": 8,
+          "n_tasks": 8,
+          "valid_draws": 2000
+        },
+        "mean_drop": {
+          "value": 0.5875,
+          "ci_lo": 0.3375,
+          "ci_hi": 0.79375,
+          "n": 8,
+          "n_tasks": 8,
+          "valid_draws": 2000
+        }
+      }
+    },
+    "id1_mean": 0.975,
+    "id1_mean_ci": {
+      "value": 0.975,
+      "ci_lo": 0.9541666666666666,
+      "ci_hi": 0.99375,
+      "n": 24,
+      "n_tasks": 24,
+      "valid_draws": 2000
+    },
+    "repeat_noise_gt_0_05": {
+      "value": 0.125,
+      "ci_lo": 0.0,
+      "ci_hi": 0.2916666666666667,
+      "n": 24,
+      "n_tasks": 24,
+      "valid_draws": 2000
+    },
+    "rename": {
+      "RN_b": {
+        "n": 14,
+        "down_gt_0_20": {
+          "value": 0.0,
+          "ci_lo": 0.0,
+          "ci_hi": 0.0,
+          "n": 14,
+          "n_tasks": 14,
+          "valid_draws": 2000
+        },
+        "down_gt_0_05": {
+          "value": 0.0,
+          "ci_lo": 0.0,
+          "ci_hi": 0.0,
+          "n": 14,
+          "n_tasks": 14,
+          "valid_draws": 2000
+        },
+        "up_gt_0_05": {
+          "value": 0.21428571428571427,
+          "ci_lo": 0.0,
+          "ci_hi": 0.42857142857142855,
+          "n": 14,
+          "n_tasks": 14,
+          "valid_draws": 2000
+        },
+        "unchanged": {
+          "value": 0.7857142857142857,
+          "ci_lo": 0.5714285714285714,
+          "ci_hi": 1.0,
+          "n": 14,
+          "n_tasks": 14,
+          "valid_draws": 2000
+        }
+      },
+      "RN_d": {
+        "n": 24,
+        "down_gt_0_20": {
+          "value": 0.0,
+          "ci_lo": 0.0,
+          "ci_hi": 0.0,
+          "n": 24,
+          "n_tasks": 24,
+          "valid_draws": 2000
+        },
+        "down_gt_0_05": {
+          "value": 0.08333333333333333,
+          "ci_lo": 0.0,
+          "ci_hi": 0.20833333333333334,
+          "n": 24,
+          "n_tasks": 24,
+          "valid_draws": 2000
+        },
+        "up_gt_0_05": {
+          "value": 0.16666666666666666,
+          "ci_lo": 0.041666666666666664,
+          "ci_hi": 0.3333333333333333,
+          "n": 24,
+          "n_tasks": 24,
+          "valid_draws": 2000
+        },
+        "unchanged": {
+          "value": 0.75,
+          "ci_lo": 0.5833333333333334,
+          "ci_hi": 0.9166666666666666,
+          "n": 24,
+          "n_tasks": 24,
+          "valid_draws": 2000
+        }
+      },
+      "pooled_gt_0_05": {
+        "value": 0.23684210526315788,
+        "ci_lo": 0.08108108108108109,
+        "ci_hi": 0.4055266805266799,
+        "n": 38,
+        "n_tasks": 24,
+        "valid_draws": 2000
+      }
+    },
+    "verdict": "supported"
   }
 }

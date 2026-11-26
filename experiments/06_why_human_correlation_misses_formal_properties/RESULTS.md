@@ -1,17 +1,16 @@
 # Results: 06_why_human_correlation_misses_formal_properties (as of 2026-11-26)
 
-Date: 2026-11-26. Preregistration: [PREREG.md](PREREG.md), committed at `f59f959` before this run. CPU reanalysis of public logs from experiments 03, 04, and 05. New model calls: none. Cost: $0.00. Intervals are 95% percentile bootstrap intervals, 2,000 draws, seed `20261124`, unless a row says it is a census. Analysis harness: Python 3, NumPy, SciPy, matplotlib (`scripts/analysis.py`).
+Date: 2026-11-26. Preregistration: [PREREG.md](PREREG.md), committed at `f59f959` before the CPU run. CPU reanalysis of public logs from experiments 03, 04, and 05 ($0.00), plus Arm I (`scores_I.csv`, 123 property probes across 21 batches of 6, `0` failed batches, judge LLM `Claude Opus 5.5` [`claude-opus-5-5`], harness Claude Code CLI [`--tools ''`], Vals plan lane `vals-claude-opus`, $0.00 extra charges; `565,123` cache-creation + `263,394` cache-read + `42` direct input tokens, `13,807` output tokens). Intervals are 95% percentile bootstrap intervals, 2,000 draws, seed `20261124`, unless a row says it is a census. Analysis harness: Python 3, NumPy, SciPy, matplotlib (`scripts/analysis.py`).
 
 ## Takeaway
 
-The overall verdict is **mixed**. The correlation and the properties are free to come apart, and on these logs they come apart in a specific way for the one judge configuration whose Spearman interval lies above 0.
+The overall CPU verdict is **mixed**, and the preregistered **Arm I verdict is `supported`**: switching the rubric from statement-only coverage (`P4_CHECKLIST`, Arm S) to implementation equivalence (`RUBRIC_I`, Arm I) on judge LLM `Claude Opus 5.5` cuts `V_bug` from **`0.568 [0.405, 0.763]`** (`27/37` ceiling ties, `mean_drop = 0.096`) down to **`0.108 [0.000, 0.259]`** (`4/37` ties, `5/37` ceiling ties, **`32/37` penalized**, `mean_drop = 0.492 [0.347, 0.620]`, `ID1` mean `0.975 [0.954, 0.994]`), confirming that the statement-only rubric target — rather than inability to see implementation bugs — drove the logged `P4_CHECKLIST` bug-tie failures.
 
 - **The statistics do not force each other.** In experiment 05 the natural-file ids (`CRIT`) and the property ids (`BUG`, `RN_b`, `RN_d`, `ID1`) are disjoint (intersection 0) while 11 tasks appear in both sets. A constructed example with 45 items has median Spearman 1 and a repeat-violation rate of 1. Human correlation on one set of files cannot certify a property on another, and a correlation of medians cannot certify a small repeat range.
 - **H-material is supported for judge LLM Claude Opus 5.5** (`claude-opus-5-5`), harness Claude Code CLI, Stanford plan, lane `stanford-claude`, rubric `P4_CHECKLIST`. The share of 37 bug pairs whose score drops by more than 0.20 is **0.108 [0.000, 0.226]** (11 tasks). 27 of 37 pairs are ceiling ties (`ID1 ≥ 0.95` and the bug stays within 0.05). The median drop is 0, which the published tie count (19 of 37) already implied; this run confirms it.
 - **H-range is mixed.** Across the 22 experiment 03 configurations with held-out Spearman at least 0.70, the median within-item repeat range is **0.097**. The pre-registered substantive cut was 0.10 and the jitter cut was 0.02. Nine of the 22 are at or above 0.10. One is at or below 0.02. These ranges are swings of about half a point on a 0–5 scale, and the label stays mixed because 0.097 is under 0.10.
 - **H-split is mixed.** On the 56 judge configurations (judge LLMs on `vb103_judge`, judge agents on `terminus2`), the partial Spearman of held-out human correlation with statement-weakening violations, given bug-tie rate, is **−0.766 [−0.847, −0.650]**, permutation p = 0.0002. The partial with bug-tie rate, given weakening, is **+0.302 [0.076, 0.478]**, p = 0.0240. Weakening tracks human correlation. Bug ties do not drop out: at a fixed weakening rate, higher human correlation goes with a higher bug-tie rate. The p-values shuffle these 56 configurations, which share models, prompts, and tasks.
-
-The implementation-rubric arm was not run. It is the call that can tell whether those ceiling ties move when the rubric grades the definition.
+- **Arm I (`RUBRIC_I`, `vals-claude-opus`) is `supported`:** On the same 24 golds and 37 bug pairs, `V_bug` drops to `0.108 [0.000, 0.259]` (meeting `<= 0.20` and `ci_hi < 0.40`), `mean_drop` rises to `0.492 [0.347, 0.620]` (meeting `>= 0.30`), material drop (`> 0.20`) rises from `0.108` (`4/37`) to `0.622 [0.438, 0.786]` (`23/37`), and declaration-rename downward drift (`RN_d > 0.05`) drops from `0.375 [0.167, 0.583]` to `0.083 [0.000, 0.208]`.
 
 ![Bug-pair classes for the three experiment 05 judge configurations](results/fig1_bug_pair_classes.png)
 
@@ -24,7 +23,8 @@ The implementation-rubric arm was not run. It is the call that can tell whether 
 | H-material | B: Claude Opus 5.5, Claude Code CLI, Stanford, `P4_CHECKLIST` | supported | drop > 0.20: 0.108 [0.000, 0.226], n = 37, 11 tasks |
 | H-range | 22 high-correlation configurations in experiment 03 | mixed | median repeat range 0.097 (p25 0.085, p75 0.133, min 0.019, max 0.238); 9/22 ≥ 0.10; 1/22 ≤ 0.02 |
 | H-split | 56 judge configurations in experiment 03 | mixed | partial(ρ, V_weak \| V_bug) = −0.766 [−0.847, −0.650], p = 0.0002; partial(ρ, V_bug \| V_weak) = +0.302 [0.076, 0.478], p = 0.0240 |
-| Overall | the three rows above | mixed | two mixed, one supported, none falsified |
+| Overall (CPU arm) | the three rows above | mixed | two mixed, one supported, none falsified |
+| **Arm I (rubric control)** | **I: `Claude Opus 5.5`, Claude Code CLI, Vals (`vals-claude-opus`), `RUBRIC_I`** | **supported** | **`V_bug = 0.108 [0.000, 0.259]`, `mean_drop = 0.492 [0.347, 0.620]`, `id1_mean = 0.975 [0.954, 0.994]`, `n_bug = 37`, `n_id1 = 24`** |
 
 H-range is a census of the logged high-correlation set, so it has no sampling interval in the verdict. The partial-correlation p-values are conditional on this logged set.
 
@@ -96,22 +96,23 @@ Point ratio `harsh_flip_eq10 / V_equiv` on every `M1_deployed_tc_v1` row. No new
 | `ministral-8b::M1` | `mistral-api` | `ministral-8b-2512` | 4 | 0.500 | 0.500 | 0.250 | 1 | no |
 | `qwen3.5-9b::M1` | `ollama-local` | `qwen3.5:9b-q4_K_M` | 5 | 0.800 | 0.800 | 0.640 | 1 | no |
 
-## What this leaves open
+## Arm I: Implementation-Equivalence Rubric (`RUBRIC_I`, as of 2026-11-26)
 
-The ceiling pattern on Claude Opus 5.5 is what the unrun implementation rubric is for. Arm S is the logged `P4_CHECKLIST` scores. Arm I would rescore `ID1`, `ID2`, `RN_b`, `RN_d`, and `BUG` under the rubric frozen in `PREREG.md`, same harness and judge LLM, Stanford lane `stanford-claude`. Support for "the statement rubric was the reason" requires V_bug ≤ 0.20 with interval upper bound < 0.40 and mean drop ≥ 0.30, on a complete 24 + 37 score file. That command was not launched.
+Arm I tests whether `Claude Opus 5.5`'s bug-tie failures in Arm S (Configuration B, `P4_CHECKLIST`, Stanford plan `stanford-claude`) occurred because `P4_CHECKLIST` graded only theorem-statement coverage rather than implementation equivalence. Arm I ran the same judge LLM (`claude-opus-5-5`) in the same harness (Claude Code CLI, `--tools ''`, empty workspace, batch size `6`, seed `20261124`) on the `123` property probes (`24 ID1`, `24 ID2`, `14 RN_b`, `24 RN_d`, `37 BUG`) via Brando's Vals plan lane `vals-claude-opus` (`21/21` batches `100%` parsed on attempt 1; public-safe CSV saved at [results/scores_I.csv](results/scores_I.csv)).
 
-```bash
-python3 experiments/06_why_human_correlation_misses_formal_properties/scripts/judge_implementation_rubric.py \
-  --probes ~/at3450/probes.jsonl \
-  --lanes stanford-claude \
-  --out ~/at3450/exp06_arm_I \
-  --confirm-plan-spend
-```
+| Arm / Rubric | Judge LLM, Harness, Lane | `ID1` mean [95% CI] (`n=24`) | `V_bug` [95% CI] (`n=37`) | `strict >` / `tie` | `mean_drop` [95% CI] | `median_drop` [95% CI] | `Penalized` (`>0.05`) | `Material` (`>0.20`) [95% CI] | `Ceiling tie` | `Inversion` | `RN_d` down `>0.05` (`n=24`) |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Arm S (`P4_CHECKLIST`) | `claude-opus-5-5`, Claude Code CLI, `stanford-claude` | 0.996 [0.990, 1.000] | 0.568 [0.405, 0.763] | 0.054 / 0.514 | 0.096 | 0.000 [0.000, 0.050] | 10/37 (0.270) | 0.108 [0.000, 0.226] | 27/37 | 0/37 | 0.375 [0.167, 0.583] |
+| **Arm I (`RUBRIC_I`)** | **`claude-opus-5-5`, Claude Code CLI, `vals-claude-opus`** | **0.975 [0.954, 0.994]** | **0.108 [0.000, 0.259]** | **0.000 / 0.108** | **0.492 [0.347, 0.620]** | **0.600 [0.150, 0.725]** | **32/37 (0.865)** | **0.622 [0.438, 0.786]** | **5/37** | **0/37** | **0.083 [0.000, 0.208]** |
+
+- **By bug level in Arm I (`V_bug` / `material >0.20` / `mean_drop`):** Level 1 (`n=11`): `0.182 [0.000, 0.455]` / `0.364 [0.091, 0.636]` / `0.295 [0.141, 0.468]`; Level 2 (`n=9`): `0.111 [0.000, 0.333]` / `0.667 [0.333, 0.889]` / `0.494 [0.267, 0.694]`; Level 3 (`n=9`): `0.000 [0.000, 0.000]` / `0.778 [0.444, 1.000]` / `0.644 [0.444, 0.817]`; Level 4 (`n=8`): `0.125 [0.000, 0.375]` / `0.750 [0.375, 1.000]` / `0.588 [0.338, 0.794]`.
+- **Descriptive repeat & rename under Arm I:** `ID2` vs `ID1` repeat noise (`>0.05`) is `0.125 [0.000, 0.292]` (`n=24`); `RN_b` (`n=14`) has `0.000 [0.000, 0.000]` downward shifts (`0.786` unchanged, `0.214` up `>0.05`); `RN_d` (`n=24`) has `0.083 [0.000, 0.208]` down `>0.05` (`0.000` down `>0.20`, `0.167` up `>0.05`, `0.750` unchanged); pooled `RN` (`n=38`) shift `>0.05` is `0.237 [0.081, 0.406]` (excess over repeat noise `+0.112`, within noise CIs).
+- **Verdict (`supported`):** Arm I clears every pre-registered support criterion (`n_id1 == 24`, `n_bug == 37`, `ID1` mean `0.975 >= 0.6`, `V_bug = 0.108 <= 0.20`, `ci_hi = 0.259 < 0.40`, `mean_drop = 0.492 >= 0.30`), establishing that `P4_CHECKLIST`'s statement-only target caused the high-correlation judge LLM's `V_bug` ties. (Note: Arm S ran on `stanford-claude` while Arm I ran on `vals-claude-opus`, both authorized Claude Code CLI lanes serving `claude-opus-5-5`.)
 
 ## Limits
 
-1. One confirmatory judge configuration. A and A2 do not have a Spearman interval above 0.
-2. Eleven tasks underlie the 37 bug pairs. The material interval for B still reaches 0.226.
+1. One confirmatory judge configuration (`B`) for Arm S vs Arm I; A and A2 do not have a Spearman interval above 0.
+2. Eleven tasks underlie the 37 bug pairs; Arm S ran on `stanford-claude` whereas Arm I ran on `vals-claude-opus` (same model `claude-opus-5-5` and harness).
 3. The 56 and the 22 share models, prompts, and tasks. The partial p-values are a conditional check on that set.
 4. Humans were not asked to score these bug probes, so this run does not say whether a human rater would have dropped the score.
 5. Experiment 03's repeat ranges are the stored means. The public repository does not hold the per-repeat scores, so those means were not rebuilt from draws.
@@ -136,7 +137,7 @@ H-material B supported share(drop>0.20)=0.108 [0.000, 0.226] n=37 tasks=11 judge
 H-range mixed median=0.097 p25=0.085 p75=0.133 min=0.019 max=0.238 n_ge_0.10=9 n_le_0.02=1 n=22
 H-split mixed partial(rho,V_weak|V_bug)=-0.766 [-0.847, -0.650] p=0.0002 partial(rho,V_bug|V_weak)=0.302 [0.076, 0.478] p=0.0240 n=56
 SLACK spearman_of_medians=1.0 v_rep=1.0 n_items=45
-ARM_I not_run
+ARM_I supported v_bug=0.108 [0.000, 0.259] mean_drop=0.492 id1_mean=0.975 n_bug=37 n_id1=24 model=claude-opus-5-5 lane=vals-claude-opus
 ALIGN exp03_spearman_abs_diff=0.000e+00 n_llm=56 n_high=22
 CLASSES A ceiling_tie=21/37 mid_tie=0/37 floor_tie=3/37 penalized=12/37 inversion=1/37 material=0.324 [0.061, 0.600] label=mixed judge_llm=GPT-6 Astra harness=Codex CLI rubric=P4_CHECKLIST
 MEDIAN_DROP A 0.000 [0.000, 1.000] corollary_zero=true n_exact_ties=24
@@ -164,6 +165,9 @@ EXP04_M1 qwen3.5-9b::M1_deployed_tc_v1 ratio=1.000 V_equiv=0.800 harsh_eq10=0.80
 ## Reproduce
 
 ```bash
-python3 experiments/06_why_human_correlation_misses_formal_properties/scripts/analysis.py
+python3 experiments/06_why_human_correlation_misses_formal_properties/scripts/analysis.py \
+  --arm-i experiments/06_why_human_correlation_misses_formal_properties/results/scores_I.csv \
+  --arm-i-model claude-opus-5-5 \
+  --arm-i-lane vals-claude-opus
 python3 -m unittest experiments/06_why_human_correlation_misses_formal_properties/scripts/test_analysis.py -v
 ```

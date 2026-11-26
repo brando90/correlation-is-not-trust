@@ -895,7 +895,18 @@ def canonical_lines(report) -> list[str]:
             f"SLACK spearman_of_medians={report['slack_lemma']['spearman_of_medians']:.1f} "
             f"v_rep={report['slack_lemma']['v_rep']:.1f} n_items=45"
         ),
-        "ARM_I not_run",
+        (
+            "ARM_I not_run"
+            if report.get("arm_i", {}).get("status") != "scored"
+            else (
+                f"ARM_I {report['arm_i']['verdict']} "
+                f"v_bug={fmt_ci(report['arm_i']['v_bug'])} "
+                f"mean_drop={report['arm_i']['mean_drop']:.3f} "
+                f"id1_mean={report['arm_i']['id1_mean']:.3f} "
+                f"n_bug={report['arm_i']['n_bug']} n_id1={report['arm_i']['n_id1']} "
+                f"model={report['arm_i']['model_id']} lane={report['arm_i']['lane']}"
+            )
+        ),
         (
             f"ALIGN exp03_spearman_abs_diff={report['exp03']['spearman_abs_diff']:.3e} "
             f"n_llm={report['exp03']['n_llm']} n_high={report['exp03']['n_high']}"
@@ -1085,22 +1096,63 @@ def write_outputs(report, out_dir: Path):
 
 def summarize_arm_i_csv(path: Path, model_id: str, lane: str):
     rows = load_score_csv(path)
+    counts = _kind_counts(rows)
     id1 = index_id1(rows)
     pairs = bug_pair_rows(rows, id1)
     v_bug = cluster_stat([(p["task"], 1.0 if p["v_bug"] else 0.0) for p in pairs], _mean, seed=SEED) if pairs else {
         "value": None, "ci_lo": None, "ci_hi": None, "n": 0, "n_tasks": 0, "valid_draws": 0
     }
+    strict = _indicator_ci(pairs, lambda p: p["strict"], seed=SEED) if pairs else None
+    tie = _indicator_ci(pairs, lambda p: p["v_bug"] and not p["strict"], seed=SEED) if pairs else None
+    mean_drop_ci = cluster_stat([(p["task"], p["drop"]) for p in pairs], _mean, seed=SEED) if pairs else None
+    median_drop_ci = cluster_stat([(p["task"], p["drop"]) for p in pairs], _median, seed=SEED) if pairs else None
+    material = _indicator_ci(pairs, lambda p: p["material"], seed=SEED) if pairs else None
+    classes = {name: _indicator_ci(pairs, lambda p, name=name: p["pair_class"] == name, seed=SEED) for name in CLASSES} if pairs else {}
+    n_class = {name: sum(1 for p in pairs if p["pair_class"] == name) for name in CLASSES} if pairs else {}
+    by_level = {}
+    for level in sorted({p["level"] for p in pairs}):
+        subset = [p for p in pairs if p["level"] == level]
+        by_level[str(level)] = {
+            "v_bug": _indicator_ci(subset, lambda p: p["v_bug"], seed=SEED),
+            "material": _indicator_ci(subset, lambda p: p["material"], seed=SEED),
+            "mean_drop": cluster_stat([(p["task"], p["drop"]) for p in subset], _mean, seed=SEED),
+        }
+    id1_mean_ci = cluster_stat(list(id1.items()), _mean, seed=SEED) if id1 else None
+    id2_rows = [row for row in rows if row["kind"] == "ID2"]
+    repeat_noise = (
+        cluster_stat([(row["task"], 1.0 if abs(row["score"] - id1[row["task"]]) > 0.05 + EPS else 0.0) for row in id2_rows if row["task"] in id1], _mean, seed=SEED)
+        if id2_rows else None
+    )
+    rn_b = rename_block(rows, id1, "RN_b") if any(r["kind"] == "RN_b" for r in rows) else None
+    rn_d = rename_block(rows, id1, "RN_d") if any(r["kind"] == "RN_d" for r in rows) else None
+    rn_pooled = [r for r in rows if r["kind"] in ("RN_b", "RN_d") and r["task"] in id1]
+    rn_pooled_gt_0_05 = (
+        cluster_stat([(r["task"], 1.0 if abs(r["score"] - id1[r["task"]]) > 0.05 + EPS else 0.0) for r in rn_pooled], _mean, seed=SEED)
+        if rn_pooled else None
+    )
     mean_drop = float(np.mean([p["drop"] for p in pairs])) if pairs else None
     id1_mean = float(np.mean(list(id1.values()))) if id1 else None
     return {
         "status": "scored",
         "model_id": model_id,
         "lane": lane,
+        "n_by_kind": counts,
         "n_bug": len(pairs),
         "n_id1": len(id1),
         "v_bug": v_bug,
+        "strict": strict,
+        "tie": tie,
         "mean_drop": mean_drop,
+        "mean_drop_ci": mean_drop_ci,
+        "median_drop": median_drop_ci,
+        "material_drop_gt_0_20": material,
+        "n_class": n_class,
+        "classes": classes,
+        "by_level": by_level,
         "id1_mean": id1_mean,
+        "id1_mean_ci": id1_mean_ci,
+        "repeat_noise_gt_0_05": repeat_noise,
+        "rename": {"RN_b": rn_b, "RN_d": rn_d, "pooled_gt_0_05": rn_pooled_gt_0_05},
         "verdict": verdict_arm_i(v_bug, mean_drop, id1_mean, len(pairs), len(id1), model_id, lane),
     }
 

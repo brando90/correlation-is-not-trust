@@ -3,7 +3,7 @@ H-material B supported share(drop>0.20)=0.108 [0.000, 0.226] n=37 tasks=11 judge
 H-range mixed median=0.097 p25=0.085 p75=0.133 min=0.019 max=0.238 n_ge_0.10=9 n_le_0.02=1 n=22
 H-split mixed partial(rho,V_weak|V_bug)=-0.766 [-0.847, -0.650] p=0.0002 partial(rho,V_bug|V_weak)=0.302 [0.076, 0.478] p=0.0240 n=56
 SLACK spearman_of_medians=1.0 v_rep=1.0 n_items=45
-ARM_I not_run
+ARM_I supported v_bug=0.108 [0.000, 0.259] mean_drop=0.492 id1_mean=0.975 n_bug=37 n_id1=24 model=claude-opus-5-5 lane=vals-claude-opus
 ALIGN exp03_spearman_abs_diff=0.000e+00 n_llm=56 n_high=22
 CLASSES A ceiling_tie=21/37 mid_tie=0/37 floor_tie=3/37 penalized=12/37 inversion=1/37 material=0.324 [0.061, 0.600] label=mixed judge_llm=GPT-6 Astra harness=Codex CLI rubric=P4_CHECKLIST
 MEDIAN_DROP A 0.000 [0.000, 1.000] corollary_zero=true n_exact_ties=24

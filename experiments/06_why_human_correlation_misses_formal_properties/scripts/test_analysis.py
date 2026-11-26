@@ -288,6 +288,28 @@ class TestLoggedData(unittest.TestCase):
         self.assertEqual(missing, [])
         self.assertNotIn("Not run yet", body)
 
+    def test_arm_i_parity_when_scored(self):
+        scores_i = EXP / "results" / "scores_I.csv"
+        summary_path = EXP / "results" / "summary.json"
+        if not scores_i.exists() or not summary_path.exists():
+            self.skipTest("scores_I.csv not present")
+        arm_i = A.summarize_arm_i_csv(scores_i, "claude-opus-5-5", "vals-claude-opus")
+        self.assertEqual(arm_i["status"], "scored")
+        self.assertEqual(arm_i["n_id1"], 24)
+        self.assertEqual(arm_i["n_bug"], 37)
+        self.assertEqual(arm_i["verdict"], "supported")
+        stored = json.loads(summary_path.read_text(encoding="utf-8"))
+        self.assertEqual(stored["arm_i"]["verdict"], arm_i["verdict"])
+        self.assertAlmostEqual(stored["arm_i"]["v_bug"]["value"], arm_i["v_bug"]["value"], places=12)
+        self.assertAlmostEqual(stored["arm_i"]["mean_drop"], arm_i["mean_drop"], places=12)
+        self.assertAlmostEqual(stored["arm_i"]["id1_mean"], arm_i["id1_mean"], places=12)
+        report = A.build_report()
+        report["arm_i"] = arm_i
+        self.assertEqual(
+            A.canonical_lines(report),
+            (EXP / "results" / "canonical_lines.txt").read_text(encoding="utf-8").splitlines(),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
