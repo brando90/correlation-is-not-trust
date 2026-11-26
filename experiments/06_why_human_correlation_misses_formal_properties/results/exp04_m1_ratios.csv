@@ -1,0 +1,7 @@
+config_id,harness,model,n_t1_equiv,V_equiv,harsh_flip_eq10,mean_abs_equiv_shift,ratio_harsh_eq10_over_v_equiv,seen_while_writing_prereg
+claude-sonnet-4-6::M1_deployed_tc_v1,claude-p-cli,claude-sonnet-4-6,12.0,0.75,0.75,0.4166666666666667,1.0,True
+gpt-5.4::M1_deployed_tc_v1,openai-api,gpt-5.4,13.0,0.6153846153846154,0.6153846153846154,0.29999999999999993,1.0,True
+leanstral::M1_deployed_tc_v1,mistral-api,labs-leanstral-1-5-1,10.0,0.3,0.3,0.16,1.0,False
+ministral-14b::M1_deployed_tc_v1,mistral-api,ministral-14b-2512,4.0,0.75,0.75,0.325,1.0,False
+ministral-8b::M1_deployed_tc_v1,mistral-api,ministral-8b-2512,4.0,0.5,0.5,0.25,1.0,False
+qwen3.5-9b::M1_deployed_tc_v1,ollama-local,qwen3.5:9b-q4_K_M,5.0,0.8,0.8,0.64,1.0,False

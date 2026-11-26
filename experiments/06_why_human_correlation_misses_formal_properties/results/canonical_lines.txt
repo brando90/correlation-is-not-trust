@@ -1,0 +1,28 @@
+OVERALL mixed
+H-material B supported share(drop>0.20)=0.108 [0.000, 0.226] n=37 tasks=11 judge_llm=Claude Opus 5.5 harness=Claude Code CLI plan=Stanford rubric=P4_CHECKLIST
+H-range mixed median=0.097 p25=0.085 p75=0.133 min=0.019 max=0.238 n_ge_0.10=9 n_le_0.02=1 n=22
+H-split mixed partial(rho,V_weak|V_bug)=-0.766 [-0.847, -0.650] p=0.0002 partial(rho,V_bug|V_weak)=0.302 [0.076, 0.478] p=0.0240 n=56
+SLACK spearman_of_medians=1.0 v_rep=1.0 n_items=45
+ARM_I not_run
+ALIGN exp03_spearman_abs_diff=0.000e+00 n_llm=56 n_high=22
+CLASSES A ceiling_tie=21/37 mid_tie=0/37 floor_tie=3/37 penalized=12/37 inversion=1/37 material=0.324 [0.061, 0.600] label=mixed judge_llm=GPT-6 Astra harness=Codex CLI rubric=P4_CHECKLIST
+MEDIAN_DROP A 0.000 [0.000, 1.000] corollary_zero=true n_exact_ties=24
+GAP A id1_minus_crit=0.757 [0.628, 0.869] crit_le_0.20=61/75
+TASK_SPEARMAN A reported -0.139 [-0.645, 0.499] n_tasks=11 shared_tasks=11
+DISJOINT A BUG=0 RN_b=0 RN_d=0 ID1=0
+CLASSES A2 ceiling_tie=24/37 mid_tie=0/37 floor_tie=0/37 penalized=9/37 inversion=4/37 material=0.243 [0.056, 0.447] label=mixed judge_llm=GPT-6 Astra harness=Codex CLI rubric=P8_STRICT_B
+MEDIAN_DROP A2 0.000 [0.000, 0.000] corollary_zero=true n_exact_ties=24
+GAP A2 id1_minus_crit=0.845 [0.757, 0.907] crit_le_0.20=71/75
+TASK_SPEARMAN A2 reported -0.046 [-0.778, 0.687] n_tasks=11 shared_tasks=11
+DISJOINT A2 BUG=0 RN_b=0 RN_d=0 ID1=0
+CLASSES B ceiling_tie=27/37 mid_tie=0/37 floor_tie=0/37 penalized=10/37 inversion=0/37 material=0.108 [0.000, 0.226] label=supported judge_llm=Claude Opus 5.5 harness=Claude Code CLI rubric=P4_CHECKLIST
+MEDIAN_DROP B 0.000 [0.000, 0.050] corollary_zero=true n_exact_ties=19
+GAP B id1_minus_crit=0.778 [0.725, 0.826] crit_le_0.20=52/75
+TASK_SPEARMAN B reported -0.256 [-0.770, 0.403] n_tasks=11 shared_tasks=11
+DISJOINT B BUG=0 RN_b=0 RN_d=0 ID1=0
+EXP04_M1 claude-sonnet-4-6::M1_deployed_tc_v1 ratio=1.000 V_equiv=0.750 harsh_eq10=0.750 seen_at_prereg=true harness=claude-p-cli model=claude-sonnet-4-6
+EXP04_M1 gpt-5.4::M1_deployed_tc_v1 ratio=1.000 V_equiv=0.615 harsh_eq10=0.615 seen_at_prereg=true harness=openai-api model=gpt-5.4
+EXP04_M1 leanstral::M1_deployed_tc_v1 ratio=1.000 V_equiv=0.300 harsh_eq10=0.300 seen_at_prereg=false harness=mistral-api model=labs-leanstral-1-5-1
+EXP04_M1 ministral-14b::M1_deployed_tc_v1 ratio=1.000 V_equiv=0.750 harsh_eq10=0.750 seen_at_prereg=false harness=mistral-api model=ministral-14b-2512
+EXP04_M1 ministral-8b::M1_deployed_tc_v1 ratio=1.000 V_equiv=0.500 harsh_eq10=0.500 seen_at_prereg=false harness=mistral-api model=ministral-8b-2512
+EXP04_M1 qwen3.5-9b::M1_deployed_tc_v1 ratio=1.000 V_equiv=0.800 harsh_eq10=0.800 seen_at_prereg=false harness=ollama-local model=qwen3.5:9b-q4_K_M

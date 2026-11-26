@@ -122,16 +122,17 @@ class TestStatistics(unittest.TestCase):
         self.assertEqual(first["n"], 6)
 
     def test_partial_spearman_known_cases(self):
-        rho = list(range(40))
-        weak = list(range(40))
+        rho = [float(i) for i in range(40)]
         rng = np.random.default_rng(0)
+        weak = (np.asarray(rho) + rng.normal(0.0, 5.0, size=40)).tolist()
         bug = rng.normal(size=40).tolist()
-        self.assertIsNone(A.partial_spearman(rho, weak, weak))
+        self.assertIsNone(A.partial_spearman(rho, rho, rho))
         both = A.partial_bundle(rho, weak, bug, draws=200, perm_draws=300)
         noise = A.partial_bundle(rho, bug, weak, draws=200, perm_draws=300)
-        self.assertGreater(both["value"], 0.95)
+        self.assertGreater(both["value"], 0.90)
         self.assertGreater(both["ci_lo"], 0.8)
         self.assertLess(both["p_val"], 0.05)
+        self.assertIsNotNone(noise["value"])
         self.assertLess(abs(noise["value"]), 0.45)
 
     def test_constants_match_the_prereg_cuts(self):

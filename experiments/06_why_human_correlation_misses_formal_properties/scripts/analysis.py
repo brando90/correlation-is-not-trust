@@ -539,9 +539,17 @@ def slack_example():
         ranges.append(max(reps) - min(reps))
     v_rep = sum(1.0 if span > 1e-12 else 0.0 for span in ranges) / len(ranges)
     rho = spearman(human, human)
-    if rho != 1.0 or v_rep != 1.0:
+    # Pearson-on-ranks is 1 up to a float error of about 1e-16. The ranks are identical.
+    if rho is None or abs(rho - 1.0) > 1e-9 or abs(v_rep - 1.0) > 1e-12:
         raise RuntimeError(f"slack example failed: rho={rho} v_rep={v_rep}")
-    return {"n_items": 45, "n_repeats": 3, "spearman_of_medians": rho, "v_rep": v_rep, "mean_range": 1.0}
+    return {
+        "n_items": 45,
+        "n_repeats": 3,
+        "spearman_of_medians": 1.0,
+        "spearman_of_medians_raw": rho,
+        "v_rep": v_rep,
+        "mean_range": 1.0,
+    }
 
 
 def _kind_counts(rows):
