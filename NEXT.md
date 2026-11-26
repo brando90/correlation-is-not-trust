@@ -1,34 +1,18 @@
-# Next experiment (as of 2026-11-26)
+# Next (as of 2026-11-26)
 
-## Decision
+## Completed on 2026-11-26
 
-Experiment 06 is the next measurement: why a correlation with human ratings can sit beside a failure of formal judge properties. The cuts are frozen in `experiments/06_why_human_correlation_misses_formal_properties/PREREG.md` (commit `f59f959`, before the CPU run). The CPU results are in that folder's `RESULTS.md`.
+1. **Exp 06 Arm I (`experiments/06_why_human_correlation_misses_formal_properties/`) — `supported`**
+   - Executed `scripts/judge_implementation_rubric.py` (`RUBRIC_I`, `123` probes in `21` batches) using judge LLM `claude-opus-5-5` via Claude Code CLI (`vals-claude-opus`, `$0.00` extra charges).
+   - Switching to implementation equivalence cuts `V_bug` from `0.568` (`P4_CHECKLIST`) to `0.108` [0.000, 0.259], with `mean_drop = 0.492` [0.347, 0.620], `penalized = 32/37` (`0.865` [0.697, 1.000]), `inversion = 0/37`, and `id1_mean = 0.975` (`RN_d down > 0.05` drops from `0.375` to `0.083` [0.000, 0.208]).
 
-A new human-correlation column on the VeriBench formal-specification-coverage runs from experiment 04 would repeat the "whether." Experiments 03 and 05 already show the coexistence. That correlation is the later measurement if a slide needs the link inside the coverage score, and the human ratings are not in this repository.
+2. **Exp 07 (`experiments/07_proper_scores_are_not_trust_and_amortized_property_certification/`) — all 3 preregistered hypotheses `supported` (`$0.00` CPU)**
+   - **Part A (`H1-proper`):** `29/29` Lean 4 judge configs beating `CONST_train` (`0.1739` `RPS`) on `RPS`, `27/27` beating `CONST_train` across all 3 proper scores (`RPS`, `CE`, `TVD`), and `24/24` matching/beating human `LORO` (`0.1469` `RPS`) still fail at least one non-bug property (`V_weak`, `V_rep`, calibrated `V_weak_cal`, calibrated repeat `rep_cal_tvd`, `rep_cal_ev_range_05`).
+   - **Part B (`H-Idea3`):** Train-only amortized multi-property `ATI` generalizes out-of-family (`test` `n=18`: `ATI_equal` Spearman `0.690`, `p=0.0020`, `reg=0.0022`; `ATI_cal_rps` `0.676`, `p=0.0022`, `reg=0.0013`; `LOMFO-CV` `n=56`: `ATI_equal` `0.721`, `ATI_cal_rps` `0.748`) and rejects `4/4` deterministic controls (`0/4` pass the multi-property gate).
+   - **Part C (`H2-new`):** New VeriBench (`100` items / `25` tasks) shows `71.7%` [59.3%, 83.7%] `5/5` saturation (`14.7%` [4.0%, 28.0%] on Old VeriBench) while keeping `88.6%` [77.3%, 97.7%] human disagreement on non-ceiling (`min < 5`, `44/100`) items.
 
-## CPU findings
+## Next experiment for Grok Bot / Cursor
 
-Overall verdict: **mixed**. Cost $0. No new model calls.
-
-- The natural-file ids and the property ids in experiment 05 are disjoint, and a constructed 45-item example has median Spearman 1 with a repeat-violation rate of 1. The correlation does not constrain the property.
-- **H-material supported** for judge LLM Claude Opus 5.5 (`claude-opus-5-5`), harness Claude Code CLI, Stanford plan, rubric `P4_CHECKLIST`: the share of bug pairs that drop by more than 0.20 is **0.108 [0.000, 0.226]** (37 pairs, 11 tasks). 27 of 37 pairs are ceiling ties.
-- **H-range mixed.** Median within-item repeat range on the 22 high-correlation configurations is **0.097** (cut for a clear swing was 0.10; cut for jitter was 0.02). Nine of 22 are at or above 0.10. One is at or below 0.02.
-- **H-split mixed** on the 56 judge configurations (judge LLMs on `vb103_judge`, judge agents on `terminus2`). Partial Spearman of held-out correlation with statement weakening, given bug ties, is **−0.766 [−0.847, −0.650]**, p = 0.0002. Partial with bug ties, given weakening, is **+0.302 [0.076, 0.478]**, p = 0.0240. At a fixed weakening rate, higher human correlation goes with more bug ties. The p-values are conditional on this logged set, which shares models, prompts, and tasks.
-
-Gold-as-candidate scores sit about 0.78 above the natural files the correlation uses (B: 0.778 [0.725, 0.826]). B scores 52 of 75 natural files at 0.20 or below while the gold mean is 0.996 [0.990, 1.000].
-
-Every logged `M1_deployed_tc_v1` row in experiment 04 has `harsh_flip_eq10 / V_equiv = 1`, so an equivalence change is also a full-credit bit flip. The two frontier rows were already visible when the preregistration was written. The other four rows were not. Mean absolute shifts still differ (0.16 to 0.64).
-
-## Next command
-
-There is no GPU arm. The unpaid compute is the CPU script already run. The remaining arm is one implementation rubric on the same judge LLM and harness as configuration B. It was not launched. About $3 to $5 API-equivalent, $0 out of pocket, Stanford plan first, then Vals if that lane is paused. No agy, no Llama 4.
-
-```bash
-python3 experiments/06_why_human_correlation_misses_formal_properties/scripts/judge_implementation_rubric.py \
-  --probes ~/at3450/probes.jsonl \
-  --lanes stanford-claude \
-  --out ~/at3450/exp06_arm_I \
-  --confirm-plan-spend
-```
-
-Support on that arm, from the PREREG: V_bug ≤ 0.20 with interval upper bound < 0.40, and mean drop ≥ 0.30, on a complete file of 24 gold scores and 37 bug scores. If the ceiling ties remain, the failure is in the judge LLM after the rubric has asked about the definition. If they move, the failure on the logged `P4_CHECKLIST` scores was the statement target.
+- **Exp 08 — Prospective zero-exposure multi-property `(a)–(e)` certification + order-permutation stress test on a held-out family**
+  - Run prospective unseen judge agents/LLMs (via `vals` / Stanford lanes only; never `agy` or Llama 4) on held-out Lean 4 and/or VeriBench slices covering all five trust properties `(a)` repeat stability, `(b)` weakening/monotone symmetry, `(c)` order/position permutation invariance (pairwise / multi-reference), `(d)` length/verbosity neutrality (`id1`), and `(e)` bug sensitivity (`RUBRIC_I`), comparing proper-score calibration (`CE`/`RPS`/`TVD`) vs `ATI` gating prospectively with zero exposure during feature/weight fitting.
+  - Read [SYNC.md](SYNC.md) and coordinate via `brando90/agent-sync` before launching any new runs.

@@ -1,0 +1,5 @@
+VERDICT_H1_PROPER supported q_const_rps=29 q_const_rps_fail=29 q_const_all3=27 q_const_all3_fail=27 q_loro=24 q_loro_fail=24
+VERDICT_H_IDEA3 supported ati_equal_test_sp=0.690 p=0.0020 reg_rps=0.0022 ati_cal_test_sp=0.676 p=0.0022 reg_rps=0.0013 ctl_reject=4/4 gate_ctl_pass=0/4
+LOMFO_OOF ati_equal_sp=0.721 p=0.0002 ati_cal_sp=0.748 p=0.0002 ati_min_sp=0.750 cms_sp=0.754
+VERDICT_H2_NEW supported new_p5=0.717 [0.593, 0.837] new_nonceil_disag=0.886 [0.773, 0.977] n_nonceil=44/100 old_p5=0.147 [0.040, 0.280] old_nonceil_disag=0.912 [0.848, 0.971]
+ALIGN a1_checks=436 a1_max_diff=3.33e-16 a2_checks=480 a2_max_diff=0.00e+00
