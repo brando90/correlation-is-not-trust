@@ -1,0 +1,16 @@
+{"probe_id": "ID1__task_0__0", "kind": "ID1", "task": "task_0", "level": 0, "reference": "REF", "candidate": "CAND"}
+{"probe_id": "BUG__task_0__1", "kind": "BUG", "task": "task_0", "level": 1, "reference": "REF", "candidate": "CAND_BUG"}
+{"probe_id": "RN_b__task_0__1", "kind": "RN_b", "task": "task_0", "level": 1, "reference": "REF", "candidate": "CAND_RNB"}
+{"probe_id": "RN_d__task_0__1", "kind": "RN_d", "task": "task_0", "level": 1, "reference": "REF", "candidate": "CAND_RND"}
+{"probe_id": "ID2__task_0__0", "kind": "ID2", "task": "task_0", "level": 0, "reference": "REF", "candidate": "CAND"}
+{"probe_id": "ID1__task_1__0", "kind": "ID1", "task": "task_1", "level": 0, "reference": "REF", "candidate": "CAND"}
+{"probe_id": "BUG__task_1__1", "kind": "BUG", "task": "task_1", "level": 1, "reference": "REF", "candidate": "CAND_BUG"}
+{"probe_id": "ID1__task_2__0", "kind": "ID1", "task": "task_2", "level": 0, "reference": "REF", "candidate": "CAND"}
+{"probe_id": "BUG__task_2__1", "kind": "BUG", "task": "task_2", "level": 1, "reference": "REF", "candidate": "CAND_BUG"}
+{"probe_id": "ID1__task_3__0", "kind": "ID1", "task": "task_3", "level": 0, "reference": "REF", "candidate": "CAND"}
+{"probe_id": "BUG__task_3__1", "kind": "BUG", "task": "task_3", "level": 1, "reference": "REF", "candidate": "CAND_BUG"}
+{"probe_id": "ID1__task_4__0", "kind": "ID1", "task": "task_4", "level": 0, "reference": "REF", "candidate": "CAND"}
+{"probe_id": "BUG__task_4__1", "kind": "BUG", "task": "task_4", "level": 1, "reference": "REF", "candidate": "CAND_BUG"}
+{"probe_id": "ID1__task_5__0", "kind": "ID1", "task": "task_5", "level": 0, "reference": "REF", "candidate": "CAND"}
+{"probe_id": "BUG__task_5__1", "kind": "BUG", "task": "task_5", "level": 1, "reference": "REF", "candidate": "CAND_BUG"}
+{"probe_id": "CRIT__task_0__agent0", "kind": "CRIT", "task": "task_0", "level": 0, "reference": "REF", "candidate": "CAND_CRIT"}
