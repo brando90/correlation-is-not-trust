@@ -870,7 +870,9 @@ def analyze_part_a_and_b(
             else:
                 loro_matched_s = loro_all5["smoothed"]
             proper["ce_cal_all5"]["matched_loro_rps"] = float(loro_matched_s["rps"]["value"])
+            proper["ce_cal_all5"]["matched_loro_rps_ci"] = [float(loro_matched_s["rps"]["ci_lo"]), float(loro_matched_s["rps"]["ci_hi"])]
             proper["ce_cal_all5"]["matched_loro_ce"] = float(loro_matched_s["ce"]["value"])
+            proper["ce_cal_all5"]["matched_loro_ce_ci"] = [float(loro_matched_s["ce"]["ci_lo"]), float(loro_matched_s["ce"]["ci_hi"])]
             proper["ce_cal_exp3"] = metric_bundle(ce_l3, const_losses_3, ho_r_exp3)
 
             # Calibrated-distribution axiomatic metrics (using ce_fn_5)
@@ -1399,11 +1401,11 @@ def plot_fig1(path: Path, records: list[dict[str, Any]], pa: dict[str, Any]) -> 
         ax1.scatter(xs, ys, c=color, marker=marker, s=55, alpha=0.88, label=f"{label} ({len(grp)})", edgecolors="black", linewidths=0.4)
 
     annot_offsets = {
-        "qwen36|H2": (-5, -15),
-        "qwen36|R4": (-5, 8),
-        "t2_sonnet5|H2": (-10, -14),
-        "gem31h|H2": (8, -2),
-        "sol6h|H2": (10, 6),
+        "qwen36|H2": (-5, -16),
+        "qwen36|R4": (-5, 9),
+        "t2_sonnet5|H2": (-10, -15),
+        "gem31h|H2": (10, -9),
+        "sol6h|H2": (10, 10),
         "opus55x|H2": (8, -6),
     }
     for r in q_loro[:6]:
@@ -1427,9 +1429,9 @@ def plot_fig1(path: Path, records: list[dict[str, Any]], pa: dict[str, Any]) -> 
     ax1.set_xlabel("CE-calibrated held-out RPS (all5, lower is better)")
     ax1.set_ylabel("Max non-bug violation: max(V_weak, V_rep)")
     ax1.set_title("Proper-Score Qualification vs. Axiomatic Violations")
-    ax1.set_ylim(-0.04, 1.06)
+    ax1.set_ylim(-0.06, 1.06)
     ax1.grid(True)
-    ax1.legend(loc="lower right", fontsize=7.5, framealpha=0.92)
+    ax1.legend(loc="upper left", fontsize=7.0, framealpha=0.92)
 
     top_show = sorted([r for r in real_elig if r["beats_const_rps"]], key=lambda r: r["proper"]["ce_cal_all5"]["rps"]["value"])[:10]
     y_pos = np.arange(len(top_show))
@@ -1471,12 +1473,12 @@ def plot_fig2(path: Path, records: list[dict[str, Any]], part_b_rows: list[dict[
     ax1.scatter(
         [r["ati_equal"] for r in ctls],
         [r["proper"]["ce_cal_all5"]["rps"]["value"] for r in ctls],
-        c="#dc2626", marker="^", s=85, label="Controls scored by ATI_equal (rejected)", edgecolors="black", linewidths=0.4,
+        c="#dc2626", marker="^", s=85, label="Controls scored by ATI_equal (4/4 full Q, 3/4 train+val Q)", edgecolors="black", linewidths=0.4,
     )
     for r in ctls:
         dx = -28 if "random" in r["config"] else 5
         ax1.annotate(r["config"].replace("ctl|", ""), (r["ati_equal"], r["proper"]["ce_cal_all5"]["rps"]["value"]), xytext=(dx, 4), textcoords="offset points", fontsize=7.5, color="#991b1b")
-    top_te_offsets = [(-68, -4), (-74, 8), (-66, -13)]
+    top_te_offsets = [(-74, -2), (-78, 9), (-74, -15)]
     for idx_t, r in enumerate(sorted(te_real, key=lambda z: z["proper"]["ce_cal_all5"]["rps"]["value"])[:3]):
         dx, dy = top_te_offsets[idx_t]
         ax1.annotate(
@@ -1508,7 +1510,7 @@ def plot_fig2(path: Path, records: list[dict[str, Any]], part_b_rows: list[dict[
     ax2.axhline(0.0, color="black", linewidth=0.9)
     ax2.axhline(0.50, color="#047857", linestyle="--", linewidth=1.0, label="PREREG target (0.50)")
     ax2.set_xticks(x)
-    ax2.set_xticklabels([k.replace("_trainnorm", "") for k in order_idx], rotation=24, ha="right", fontsize=8.5)
+    ax2.set_xticklabels([k.replace("_trainnorm", "").replace("ATI_cal_rps", "ATI_cal_rps*") for k in order_idx], rotation=24, ha="right", fontsize=8.5)
     ax2.set_ylabel("Spearman with -CE_fit RPS")
     ax2.set_title("Property-Index Generalization & Control Rejection")
     ax2.set_ylim(-0.45, 1.15)

@@ -2454,7 +2454,15 @@
           "pearson": 0.47120451143060144,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -2808,7 +2816,15 @@
           "pearson": 0.3761639335517557,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -3158,7 +3174,15 @@
           "pearson": null,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -3512,7 +3536,15 @@
           "pearson": -0.27878817946619394,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -3868,7 +3900,15 @@
           "pearson": 0.6778567948461413,
           "n_heldout_items": 42,
           "matched_loro_rps": 0.15249689558363022,
-          "matched_loro_ce": 1.70486080583857
+          "matched_loro_rps_ci": [
+            0.1325207969473626,
+            0.17318291441669056
+          ],
+          "matched_loro_ce": 1.70486080583857,
+          "matched_loro_ce_ci": [
+            1.5095904125179918,
+            1.898692564709564
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -4223,7 +4263,15 @@
           "pearson": 0.8062647143827382,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -4576,7 +4624,15 @@
           "pearson": 0.8679394372840374,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -4931,7 +4987,15 @@
           "pearson": 0.8735637905974376,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -5284,7 +5348,15 @@
           "pearson": 0.19304201163016138,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -5641,7 +5713,15 @@
           "pearson": 0.29710003294257414,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -5997,7 +6077,15 @@
           "pearson": 0.3556716131941867,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -6353,7 +6441,15 @@
           "pearson": -0.21305929007721042,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -6709,7 +6805,15 @@
           "pearson": 0.8742030180146236,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -7065,7 +7169,15 @@
           "pearson": 0.5965303325667528,
           "n_heldout_items": 42,
           "matched_loro_rps": 0.15249689558363022,
-          "matched_loro_ce": 1.70486080583857
+          "matched_loro_rps_ci": [
+            0.1325207969473626,
+            0.17318291441669056
+          ],
+          "matched_loro_ce": 1.70486080583857,
+          "matched_loro_ce_ci": [
+            1.5095904125179918,
+            1.898692564709564
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -7420,7 +7532,15 @@
           "pearson": 0.8183044103385104,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -7776,7 +7896,15 @@
           "pearson": 0.7937474540812236,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -8132,7 +8260,15 @@
           "pearson": 0.8278730656058866,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -8488,7 +8624,15 @@
           "pearson": 0.19388884481729407,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -8845,7 +8989,15 @@
           "pearson": 0.11603828981576202,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -9201,7 +9353,15 @@
           "pearson": 0.39191252490081113,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -9557,7 +9717,15 @@
           "pearson": 0.08105976686385358,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -9913,7 +10081,15 @@
           "pearson": 0.7648184168415157,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -10269,7 +10445,15 @@
           "pearson": 0.473357370468215,
           "n_heldout_items": 42,
           "matched_loro_rps": 0.15249689558363022,
-          "matched_loro_ce": 1.70486080583857
+          "matched_loro_rps_ci": [
+            0.1325207969473626,
+            0.17318291441669056
+          ],
+          "matched_loro_ce": 1.70486080583857,
+          "matched_loro_ce_ci": [
+            1.5095904125179918,
+            1.898692564709564
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -10622,7 +10806,15 @@
           "pearson": 0.7081144412255441,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -10975,7 +11167,15 @@
           "pearson": 0.8418881572920546,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -11328,7 +11528,15 @@
           "pearson": 0.16259727308153576,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -11685,7 +11893,15 @@
           "pearson": -0.06372972858582676,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -12041,7 +12257,15 @@
           "pearson": 0.6973842209269792,
           "n_heldout_items": 42,
           "matched_loro_rps": 0.15249689558363022,
-          "matched_loro_ce": 1.70486080583857
+          "matched_loro_rps_ci": [
+            0.1325207969473626,
+            0.17318291441669056
+          ],
+          "matched_loro_ce": 1.70486080583857,
+          "matched_loro_ce_ci": [
+            1.5095904125179918,
+            1.898692564709564
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -12394,7 +12618,15 @@
           "pearson": 0.841982352818403,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -12747,7 +12979,15 @@
           "pearson": 0.8259320136983554,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -13100,7 +13340,15 @@
           "pearson": 0.8518716948320892,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -13453,7 +13701,15 @@
           "pearson": 0.08580473734931485,
           "n_heldout_items": 44,
           "matched_loro_rps": 0.14585278808493088,
-          "matched_loro_ce": 1.6646044189538352
+          "matched_loro_rps_ci": [
+            0.1246492050608122,
+            0.16797640306122447
+          ],
+          "matched_loro_ce": 1.6646044189538352,
+          "matched_loro_ce_ci": [
+            1.473708864311232,
+            1.868081869250548
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -13809,7 +14065,15 @@
           "pearson": 0.5194789920521773,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -14165,7 +14429,15 @@
           "pearson": 0.5622543849356353,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -14521,7 +14793,15 @@
           "pearson": 0.5143680600986282,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -14877,7 +15157,15 @@
           "pearson": 0.8638409096917512,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -15230,7 +15518,15 @@
           "pearson": 0.3958459621874373,
           "n_heldout_items": 42,
           "matched_loro_rps": 0.15249689558363022,
-          "matched_loro_ce": 1.70486080583857
+          "matched_loro_rps_ci": [
+            0.1325207969473626,
+            0.17318291441669056
+          ],
+          "matched_loro_ce": 1.70486080583857,
+          "matched_loro_ce_ci": [
+            1.5095904125179918,
+            1.898692564709564
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -15585,7 +15881,15 @@
           "pearson": 0.6741846219130527,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -15941,7 +16245,15 @@
           "pearson": 0.8676623704607531,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -16295,7 +16607,15 @@
           "pearson": 0.8684946873417372,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -16649,7 +16969,15 @@
           "pearson": 0.19615315312434517,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -17006,7 +17334,15 @@
           "pearson": 0.09189936041554816,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -17362,7 +17698,15 @@
           "pearson": -0.056504678267684724,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -17718,7 +18062,15 @@
           "pearson": 0.05942203323145602,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -18074,7 +18426,15 @@
           "pearson": 0.6698488448023165,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -18430,7 +18790,15 @@
           "pearson": 0.841810477026241,
           "n_heldout_items": 42,
           "matched_loro_rps": 0.15249689558363022,
-          "matched_loro_ce": 1.70486080583857
+          "matched_loro_rps_ci": [
+            0.1325207969473626,
+            0.17318291441669056
+          ],
+          "matched_loro_ce": 1.70486080583857,
+          "matched_loro_ce_ci": [
+            1.5095904125179918,
+            1.898692564709564
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -18783,7 +19151,15 @@
           "pearson": 0.6707752451039601,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -19136,7 +19512,15 @@
           "pearson": 0.7912089565385079,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -19489,7 +19873,15 @@
           "pearson": 0.8024213009685787,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -19842,7 +20234,15 @@
           "pearson": -0.013006825234783748,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -20197,7 +20597,15 @@
           "pearson": -0.3578540024251613,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -20554,7 +20962,15 @@
           "pearson": -0.07018201585893975,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -20910,7 +21326,15 @@
           "pearson": -0.15904540541332157,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -21267,7 +21691,15 @@
           "pearson": 0.7804615445889833,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -21620,7 +22052,15 @@
           "pearson": 0.5813493127091108,
           "n_heldout_items": 42,
           "matched_loro_rps": 0.15249689558363022,
-          "matched_loro_ce": 1.70486080583857
+          "matched_loro_rps_ci": [
+            0.1325207969473626,
+            0.17318291441669056
+          ],
+          "matched_loro_ce": 1.70486080583857,
+          "matched_loro_ce_ci": [
+            1.5095904125179918,
+            1.898692564709564
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -21976,7 +22416,15 @@
           "pearson": 0.8186965756826239,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -22332,7 +22780,15 @@
           "pearson": 0.856833903381317,
           "n_heldout_items": 42,
           "matched_loro_rps": 0.15249689558363022,
-          "matched_loro_ce": 1.70486080583857
+          "matched_loro_rps_ci": [
+            0.1325207969473626,
+            0.17318291441669056
+          ],
+          "matched_loro_ce": 1.70486080583857,
+          "matched_loro_ce_ci": [
+            1.5095904125179918,
+            1.898692564709564
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -22687,7 +23143,15 @@
           "pearson": 0.8554290367910038,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -23040,7 +23504,15 @@
           "pearson": 0.8286884058125823,
           "n_heldout_items": 42,
           "matched_loro_rps": 0.15249689558363022,
-          "matched_loro_ce": 1.70486080583857
+          "matched_loro_rps_ci": [
+            0.1325207969473626,
+            0.17318291441669056
+          ],
+          "matched_loro_ce": 1.70486080583857,
+          "matched_loro_ce_ci": [
+            1.5095904125179918,
+            1.898692564709564
+          ]
         },
         "ce_cal_exp3": {
           "rps": {
@@ -23395,7 +23867,15 @@
           "pearson": 0.8532204156849619,
           "n_heldout_items": 45,
           "matched_loro_rps": 0.14690639959687574,
-          "matched_loro_ce": 1.666728042947767
+          "matched_loro_rps_ci": [
+            0.12542896510456036,
+            0.16865399974804735
+          ],
+          "matched_loro_ce": 1.666728042947767,
+          "matched_loro_ce_ci": [
+            1.4767530712386348,
+            1.8660048171761332
+          ]
         },
         "ce_cal_exp3": {
           "rps": {

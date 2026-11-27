@@ -165,8 +165,9 @@ def _is_valid_score(raw: object) -> bool:
 
 
 def parse_scores(texts: list[str], n_items: int) -> dict[int, float]:
-    """Extract the last valid JSON list of {item, score} dicts using JSONDecoder.raw_decode."""
+    """Extract the last complete (or fallback latest valid partial) JSON list of {item, score} dicts."""
     decoder = json.JSONDecoder()
+    best_partial: dict[int, float] | None = None
     for text in reversed(texts):
         positions = [idx for idx, ch in enumerate(text) if ch == "["]
         for pos in reversed(positions):
@@ -195,19 +196,22 @@ def parse_scores(texts: list[str], n_items: int) -> dict[int, float]:
                     break
                 found[raw_item] = float(raw_score)
             if not bad and found:
-                return found
-    return {}
+                if len(found) == n_items:
+                    return found
+                if best_partial is None:
+                    best_partial = found
+    return best_partial or {}
 
 
-def completed_batches(
+def valid_records(
     resf: Path,
     batches: list[list[str]] | None = None,
     expected_rubric_sha: str | None = None,
-) -> set[int]:
-    """Return batch indices that match batch identity, rubric hash, and complete valid score records."""
-    done: set[int] = set()
+) -> dict[int, dict]:
+    """Return validated complete batch records keyed by batch index."""
+    out: dict[int, dict] = {}
     if not resf.exists():
-        return done
+        return out
     for line in resf.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
@@ -228,8 +232,17 @@ def completed_batches(
             continue
         if not all(_is_valid_score(v) for v in scores.values()):
             continue
-        done.add(bi)
-    return done
+        out[bi] = rec
+    return out
+
+
+def completed_batches(
+    resf: Path,
+    batches: list[list[str]] | None = None,
+    expected_rubric_sha: str | None = None,
+) -> set[int]:
+    """Return batch indices that match batch identity, rubric hash, and complete valid score records."""
+    return set(valid_records(resf, batches=batches, expected_rubric_sha=expected_rubric_sha).keys())
 
 
 def token_counts(receipt) -> dict:
@@ -358,13 +371,10 @@ def main():
         print(bi, meta["lane"], meta["model"], f"{len(scores)}/{len(batch)}", flush=True)
         n_run += 1
         prompt_path.unlink()
-    # Public-safe CSV: ids, kinds, scores. No Lean source.
+    # Public-safe CSV: ids, kinds, scores filtered identically to completed_batches. No Lean source.
     scored = {}
-    if resf.exists():
-        for line in resf.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                rec = json.loads(line)
-                scored.update(rec["scores"])
+    for rec in valid_records(resf, batches=batches, expected_rubric_sha=rubric_sha).values():
+        scored.update({pid: float(val) for pid, val in rec["scores"].items()})
     write_scores_csv(out / "scores_I.csv", byid, scored)
 
 

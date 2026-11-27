@@ -217,6 +217,8 @@ class TestApiScript(unittest.TestCase):
         self.assertEqual(parsed, {1: 1.0, 2: 0.4})
         two_arrays = 'first [{"item": 9, "score": 0.1}] middle text second [{"item": 1, "score": 0.8}, {"item": 2, "score": 0.0}]'
         self.assertEqual(J.parse_scores([two_arrays], n_items=2), {1: 0.8, 2: 0.0})
+        complete_then_partial = 'complete [{"item": 1, "score": 0.9}, {"item": 2, "score": 0.3}] trailing partial [{"item": 1, "score": 0.1}]'
+        self.assertEqual(J.parse_scores([complete_then_partial], n_items=2), {1: 0.9, 2: 0.3})
         malformed_float_bool = 'bad1 [{"item": 1.9, "score": 0.5}] bad2 [{"item": 1, "score": true}] bad3 [{"item": 1, "score": 0.5}, {"item": 1, "score": 0.6}]'
         self.assertEqual(J.parse_scores([malformed_float_bool], n_items=2), {})
         sha = "abc123"

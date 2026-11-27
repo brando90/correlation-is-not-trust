@@ -1094,7 +1094,7 @@ def write_outputs(report, out_dir: Path):
     return lines
 
 
-def summarize_arm_i_csv(path: Path, model_id: str, lane: str):
+def summarize_arm_i_csv(path: Path, model_id: str, lane: str, batches_run: int | None = None):
     rows = load_score_csv(path)
     counts = _kind_counts(rows)
     id1 = index_id1(rows)
@@ -1137,7 +1137,7 @@ def summarize_arm_i_csv(path: Path, model_id: str, lane: str):
         "model_id": model_id,
         "lane": lane,
         "arm_i_call_meta": {
-            "batches_run": 21,
+            "batches_run": batches_run,
             "probes_scored": sum(counts.values()),
             "extra_charge_usd": 0.0,
             "lane": lane,
@@ -1170,10 +1170,11 @@ def main():
     parser.add_argument("--arm-i", default=None, help="Optional Arm I scores CSV. Omit to leave Arm I as not_run.")
     parser.add_argument("--arm-i-model", default="claude-opus-5-5")
     parser.add_argument("--arm-i-lane", default="stanford-claude")
+    parser.add_argument("--arm-i-batches", type=int, default=None, help="Optional executed batch count for Arm I metadata.")
     args = parser.parse_args()
     report = build_report()
     if args.arm_i:
-        report["arm_i"] = summarize_arm_i_csv(Path(args.arm_i), args.arm_i_model, args.arm_i_lane)
+        report["arm_i"] = summarize_arm_i_csv(Path(args.arm_i), args.arm_i_model, args.arm_i_lane, batches_run=args.arm_i_batches)
     out = Path(args.out) if args.out else EXP_DIR / "results"
     lines = write_outputs(report, out)
     print(lines[0])
