@@ -23,7 +23,7 @@ Slides "Certifying the Formal Judge", slide 2 (Yegor's critique: "strict prerequ
 ## Layout
 experiments/NN_name/ (numbered, dated, PREREG.md before any run), docs/, CLAUDE.md, AGENTS.md.
 
-Next step (as of 2026-11-26): [NEXT.md](NEXT.md). Experiment 06 asks why human correlation and formal-property failure come apart, on the scores already logged in experiments 03 and 05.
+Next step (as of 2026-11-27): [NEXT.md](NEXT.md). Experiments 08 and 09 are CPU reanalyses: task-held-out calibration of the experiment 05 scores, and the selection gap on the experiment 03 table. The remaining work is a prospective zero-exposure judge run.
 
 ## Citation (as of 2026-11-24)
 ```bibtex

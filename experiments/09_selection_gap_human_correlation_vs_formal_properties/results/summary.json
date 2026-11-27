@@ -1,0 +1,262 @@
+{
+  "alignment_spearman": 0.7883251594650563,
+  "census": {
+    "n_families": 6,
+    "n_flat": 0,
+    "disagree_HP": 3,
+    "disagree_HF": 3,
+    "n_fitted": 6,
+    "mean_rho_regret_P": 0.15831247753413358,
+    "mean_rho_regret_F": 0.08986908650341073,
+    "mean_fail_gap_P": 0.16666666666666666,
+    "mean_fail_gap_F": 0.0,
+    "n_H_idea1_fail": 6,
+    "n_P_idea1_fail": 6,
+    "n_F_idea1_fail": 6
+  },
+  "families": [
+    {
+      "family": "gem31h",
+      "n": 9,
+      "lambda": 0.1,
+      "H": "gem31h|H2",
+      "P": "gem31h|H0",
+      "F": "gem31h|H0",
+      "flat": false,
+      "rho_H": 0.8799788307277261,
+      "rho_P": 0.6973729911712682,
+      "rho_F": 0.6973729911712682,
+      "fail_H": 1,
+      "fail_P": 1,
+      "fail_F": 1,
+      "idea1_H": 1,
+      "idea1_P": 1,
+      "idea1_F": 1,
+      "disagree_HP": 1,
+      "disagree_HF": 1,
+      "rho_regret_P": 0.18260583955645793,
+      "rho_regret_F": 0.18260583955645793,
+      "fail_gap_P": 0,
+      "fail_gap_F": 0,
+      "weights": [
+        0.32839845642376453,
+        0.6597743958404947,
+        0.07938355111745257,
+        0.0,
+        0.658875116548725,
+        0.3916292551816084
+      ]
+    },
+    {
+      "family": "luna",
+      "n": 11,
+      "lambda": 10.0,
+      "H": "luna6h|H2",
+      "P": "luna6h|D0",
+      "F": "t2_luna|H2",
+      "flat": false,
+      "rho_H": 0.8146597346068245,
+      "rho_P": 0.53350107812026,
+      "rho_F": 0.8103152182931853,
+      "fail_H": 3,
+      "fail_P": 2,
+      "fail_F": 3,
+      "idea1_H": 1,
+      "idea1_P": 1,
+      "idea1_F": 1,
+      "disagree_HP": 1,
+      "disagree_HF": 1,
+      "rho_regret_P": 0.28115865648656446,
+      "rho_regret_F": 0.004344516313639191,
+      "fail_gap_P": 1,
+      "fail_gap_F": 0,
+      "weights": [
+        0.016320181256772655,
+        0.26464685973648083,
+        0.011588429739426599,
+        0.14683548836059704,
+        0.13788908435312833,
+        0.08748805446271171
+      ]
+    },
+    {
+      "family": "opus55x",
+      "n": 5,
+      "lambda": 1.0,
+      "H": "opus55x|H2",
+      "P": "opus55x|H2",
+      "F": "opus55x|D0",
+      "flat": false,
+      "rho_H": 0.836979287738036,
+      "rho_P": 0.836979287738036,
+      "rho_F": 0.48471512458766874,
+      "fail_H": 1,
+      "fail_P": 1,
+      "fail_F": 1,
+      "idea1_H": 1,
+      "idea1_P": 1,
+      "idea1_F": 1,
+      "disagree_HP": 0,
+      "disagree_HF": 1,
+      "rho_regret_P": 0.0,
+      "rho_regret_F": 0.35226416315036724,
+      "fail_gap_P": 0,
+      "fail_gap_F": 0,
+      "weights": [
+        0.0679581428459207,
+        0.6313042605714213,
+        0.06260646654103051,
+        0.09813621402130179,
+        0.4796348390319904,
+        0.3476408429798007
+      ]
+    },
+    {
+      "family": "qwen",
+      "n": 11,
+      "lambda": 1.0,
+      "H": "t2_qwen|H2",
+      "P": "t2_qwen|H2",
+      "F": "t2_qwen|H2",
+      "flat": false,
+      "rho_H": 0.8699656748028578,
+      "rho_P": 0.8699656748028578,
+      "rho_F": 0.8699656748028578,
+      "fail_H": 1,
+      "fail_P": 1,
+      "fail_F": 1,
+      "idea1_H": 1,
+      "idea1_P": 1,
+      "idea1_F": 1,
+      "disagree_HP": 0,
+      "disagree_HF": 0,
+      "rho_regret_P": 0.0,
+      "rho_regret_F": 0.0,
+      "fail_gap_P": 0,
+      "fail_gap_F": 0,
+      "weights": [
+        0.07013979448195007,
+        0.6041166099811092,
+        0.06119026013479162,
+        0.10142825824974304,
+        0.39399871682346677,
+        0.5535006725586782
+      ]
+    },
+    {
+      "family": "sol6h",
+      "n": 9,
+      "lambda": 0.1,
+      "H": "sol6h|H2",
+      "P": "sol6h|D0",
+      "F": "sol6h|H2",
+      "flat": false,
+      "rho_H": 0.8110335700976696,
+      "rho_P": 0.3249232009358906,
+      "rho_F": 0.8110335700976696,
+      "fail_H": 2,
+      "fail_P": 2,
+      "fail_F": 2,
+      "idea1_H": 1,
+      "idea1_P": 1,
+      "idea1_F": 1,
+      "disagree_HP": 1,
+      "disagree_HF": 0,
+      "rho_regret_P": 0.486110369161779,
+      "rho_regret_F": 0.0,
+      "fail_gap_P": 0,
+      "fail_gap_F": 0,
+      "weights": [
+        0.14630813062775527,
+        0.627017731133533,
+        0.4302765344239186,
+        0.0,
+        0.723128112091515,
+        0.3782498538029719
+      ]
+    },
+    {
+      "family": "sonnet",
+      "n": 11,
+      "lambda": 1.0,
+      "H": "t2_sonnet5|H2",
+      "P": "t2_sonnet5|H2",
+      "F": "t2_sonnet5|H2",
+      "flat": false,
+      "rho_H": 0.8635227158328601,
+      "rho_P": 0.8635227158328601,
+      "rho_F": 0.8635227158328601,
+      "fail_H": 1,
+      "fail_P": 1,
+      "fail_F": 1,
+      "idea1_H": 1,
+      "idea1_P": 1,
+      "idea1_F": 1,
+      "disagree_HP": 0,
+      "disagree_HF": 0,
+      "rho_regret_P": 0.0,
+      "rho_regret_F": 0.0,
+      "fail_gap_P": 0,
+      "fail_gap_F": 0,
+      "weights": [
+        0.0366053158932321,
+        0.6267042113383292,
+        0.052910449570101534,
+        0.0685390620336364,
+        0.484537077086942,
+        0.40190699827387094
+      ]
+    }
+  ],
+  "verdict_h_gap": "mixed",
+  "verdict_h_gap_fitted": "falsified",
+  "h_pred": {
+    "spearman": {
+      "value": 0.42365727376783313,
+      "ci_lo": 0.19499361640007185,
+      "ci_hi": 0.6068030320411427,
+      "finite_draws": 2000
+    },
+    "permutation": {
+      "p_val": 0.001799640071985603,
+      "valid": 5000,
+      "obs": 0.42365727376783313
+    },
+    "family_cluster": {
+      "ci_lo": 0.2653260145055244,
+      "ci_hi": 0.7564282535008732,
+      "finite_draws": 2000,
+      "note": "descriptive; n=6 families; not used in the verdict"
+    },
+    "verdict": "supported"
+  },
+  "controls_descriptive": [
+    {
+      "config": "ctl|count_ratio",
+      "ati_equal": 0.5,
+      "above_real_median": false
+    },
+    {
+      "config": "ctl|editdist",
+      "ati_equal": 0.8333333333333334,
+      "above_real_median": true
+    },
+    {
+      "config": "ctl|name_jaccard",
+      "ati_equal": 0.5,
+      "above_real_median": false
+    },
+    {
+      "config": "ctl|random",
+      "ati_equal": 0.2565789473684211,
+      "above_real_median": false
+    }
+  ],
+  "ati_equal_median_real": 0.7797301248617038,
+  "machine_lines": [
+    "VERDICT_H_GAP mixed disagree_HP=3/6 fail_gap_P=0.167 rho_regret_P=0.158 idea1_H=6/6 idea1_P=6/6",
+    "VERDICT_H_GAP_FITTED falsified disagree_HF=3/6 n_flat=0 fail_gap_F=0.0",
+    "VERDICT_H_PRED supported spearman=0.424 [0.195, 0.607] p=0.001799640071985603",
+    "ALIGN spearman=0.788325159465"
+  ]
+}

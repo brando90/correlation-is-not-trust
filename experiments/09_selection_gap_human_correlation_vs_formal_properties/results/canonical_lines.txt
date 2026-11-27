@@ -1,0 +1,4 @@
+VERDICT_H_GAP mixed disagree_HP=3/6 fail_gap_P=0.167 rho_regret_P=0.158 idea1_H=6/6 idea1_P=6/6
+VERDICT_H_GAP_FITTED falsified disagree_HF=3/6 n_flat=0 fail_gap_F=0.0
+VERDICT_H_PRED supported spearman=0.424 [0.195, 0.607] p=0.001799640071985603
+ALIGN spearman=0.788325159465

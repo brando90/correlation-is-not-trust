@@ -1,18 +1,25 @@
-# Next (as of 2026-11-26)
+# Next (as of 2026-11-27)
+
+## Completed on 2026-11-27
+
+1. **Exp 08 (`experiments/08_task_heldout_calibration_of_exp05_judges/`) — `H1-cal` untestable. `$0.00` CPU.**
+   - Leave-one-task-out ordinal calibration of the three experiment 05 score files, with the constant fit only on the training tasks. No configuration beats that constant on `RPS` (A `+0.0007 [-0.0046, +0.0060]`, A2 `+0.0020 [+0.0008, +0.0035]`, B `-0.0066 [-0.0229, +0.0136]`). The raw point-mass gap stays `+0.20` to `+0.31`, so the experiment 05 result was not an artifact of an in-sample constant.
+   - Where the slope is positive on all 25 tasks (A and B), exact `V_bug` is unchanged. B's declaration-rename share above `0.05` falls from `0.375 [0.167, 0.542]` to `0.000`, while the exact-change share stays `0.583`. A2 has a negative slope on `5/25` tasks and is reliably worse than the constant on `RPS`, `TVD`, and `CE`.
+
+2. **Exp 09 (`experiments/09_selection_gap_human_correlation_vs_formal_properties/`) — `H-gap` mixed, `H-gap-fitted` falsified, `H-pred` supported. `$0.00` CPU.**
+   - On the 56 experiment 03 configurations, grouped so a `terminus2` judge agent stays with its base judge LLM, the highest-`rho_heldout` config and the highest-`ATI_equal` config differ in `3/6` families. Mean Spearman regret `0.158`. Mean extra gate failures `0.167` (the pre-registered support cut was `0.5`). Both picks fail `V_weak` or `V_rep` in `6/6` families.
+   - A ridge whose target is `rho_heldout` has failure gap `0` (falsified) and out-of-fold Spearman `0.424 [0.195, 0.607]` (`p = 0.0018`). Experiment 07 already reported the unfitted `ATI_equal` Spearman `0.788` with the same human correlation.
 
 ## Completed on 2026-11-26
 
-1. **Exp 06 Arm I (`experiments/06_why_human_correlation_misses_formal_properties/`) — `supported`**
-   - Executed `scripts/judge_implementation_rubric.py` (`RUBRIC_I`, `123` probes in `21` batches) using judge LLM `claude-opus-5-5` via Claude Code CLI (`vals-claude-opus`, `$0.00` extra charges).
-   - Switching to implementation equivalence cuts `V_bug` from `0.568 [0.405, 0.765]` (`P4_CHECKLIST`) to `0.108 [0.000, 0.259]`, with `mean_drop = 0.492 [0.347, 0.620]`, `penalized = 32/37` (`0.865 [0.697, 1.000]`), `inversion = 0/37`, and `id1_mean = 0.975 [0.954, 0.994]` (`RN_d` down `> 0.05` drops from `0.375 [0.167, 0.583]` to `0.083 [0.000, 0.208]`).
+1. **Exp 06 Arm I — `supported`.** Implementation-equivalence rubric, judge LLM `claude-opus-5-5`, Claude Code CLI, `vals-claude-opus`, `$0.00` extra. `V_bug` `0.108 [0.000, 0.259]`.
+2. **Exp 07 — `$0.00` CPU.** `H1-proper` supported (`29/29` `CONST_train`-beating configs still fail `V_weak` or `V_rep`). `H-Idea3` literal supported / leak-free preregistered falsified / `ATI_min` extension supported. `H2-new` supported (New VeriBench rating-weighted `P(r == 5) = 0.729 [0.605, 0.850]`; non-ceiling disagreement `0.886 [0.773, 0.977]`).
 
-2. **Exp 07 (`experiments/07_proper_scores_are_not_trust_and_amortized_property_certification/`) — `$0.00` CPU**
-   - **Part A (`H1-proper = supported`):** `29/29` Lean 4 judge configs beating `CONST_train` (`0.1739 [0.1424, 0.2085]` `RPS`) on proper score `RPS`, `27/27` beating `CONST_train` across `RPS`, `CE`, and `TVD` distribution distance, and `24/24` matching/beating matched-item human `LORO` (`0.1469 [0.1254, 0.1687]` `RPS` on `45/45`; `0.1525 [0.1325, 0.1732]` on `42/45`; `0.1459 [0.1246, 0.1680]` on `44/45`) still fail `V_weak` or `V_rep` (plus calibrated repeat shifts `rep_cal_tvd`).
-   - **Part B (`H-Idea3`: literal `supported` / leak-free PREREG `falsified` / `ATI_min` ext. `supported`):** `ATI` predicts `-CE_fit RPS` on canonical `test` (`n=18`: `ATI_equal` Spearman `0.690 [0.318, 0.881]`, `p=0.0020`, `regret=0.0022`; `ATI_cal_rps` `0.676 [0.247, 0.887]`, `p=0.0022`, `regret=0.0013`) and zero-weight-overlap `test_unseen_weights` (`n=16`: `0.685 [0.281, 0.872]` / `0.696 [0.245, 0.914]` / `0.641 [0.172, 0.873]`) + grouped `6`-fold `LOMFO-CV` (`n=56`: `ATI_equal` `0.721 [0.586, 0.806]`, `ATI_min` `0.750 [0.608, 0.843]`, `ATI_cal_rps` `0.748` descriptive). Under leak-free `train+val` `Q_const_rps`, preregistered `ATI_equal` & `ATI_cal_rps` reject `3/4` controls (`falsified` vs. `4/4` under literal full `Q`), whereas worst-case `ATI_min` (`4/4` leak-free) and hard `Gate_all` (`0/4` pass controls, `0/56` real configs) cleanly reject all `4/4` controls.
-   - **Part C (`H2-new = supported`):** New VeriBench (`100` items / `25` tasks) has rating-weighted `P(r == 5) = 0.729 [0.605, 0.850]` (item-weighted `0.717 [0.593, 0.837]`, vs. Old `0.113 [0.028, 0.226]` / `0.147`) while keeping `0.886 [0.773, 0.977]` human disagreement on non-ceiling (`min < 5`, `44/100`) items.
+## Still blocked (do not fabricate)
 
-## Next experiment for Grok Bot / Cursor
+These need data or plan lanes that are not on a fresh checkout of this repository. Do not invent scores, and do not send real judge calls through `agy` or Llama 4.
 
-- **Exp 08 — Prospective zero-exposure multi-property evaluation + order-permutation & verbosity tests on a held-out family**
-  - Run prospective unseen judge agents/LLMs (via `vals` / Stanford lanes only; never `agy` or Llama 4) on held-out Lean 4 and/or VeriBench slices covering the established formal trust checks plus new perturbations: (a) repeat stability (`ID2` / `V_rep`), (b) monotone weakening / overconstraint / vacuity (`V_weak`, `V_overc`, `V_vac`), (c) gold-as-candidate identity baseline (`ID1`) + binder/declaration renaming & formatting invariance (`RN_b`, `RN_d`, `V_fmt`), (d) pairwise / multi-reference order permutation invariance, (e) implementation bug sensitivity (`RUBRIC_I` / `V_bug`), and separate controlled length/verbosity perturbations — comparing proper-score calibration (`CE`, `RPS`) and `TVD` distance vs. `ATI_min` / `Gate_all` prospectively with zero exposure during fitting.
-  - Read [SYNC.md](SYNC.md) and coordinate via `brando90/agent-sync` before launching any new runs.
+1. **Prospective zero-exposure judge run (the old "Exp 08" plan, now the next numbered folder).** Held-out Lean 4 and/or VeriBench slices covering repeat stability, monotone weakening, gold-as-candidate identity, binder and declaration renaming, order permutation, implementation-bug sensitivity, and a separate length perturbation. Compare proper scores (`RPS`, `CE`) and `TVD` with `ATI_min` / `Gate_all` on judges that were not in the fitting panel. Requires Brando's Vals or Stanford lanes. This VM has no plan router.
+2. **Powered rename and order probes for README properties (a) and (e).** A generator is not a powered probe until Lean accepts the renamed and reordered files. The Lean project and the private probe sources are off this checkout (`cert-judge` experiment 39). Experiment 05 already logged `RN_b` / `RN_d` for three configurations. Experiment 03's `reorder` set had `0/75` valid probes.
+3. **New VeriBench human annotation.** Experiment 07's New VeriBench file is an interim multiset: `247` ratings, `100` items, `min_n = 2`, `max_n = 4`, no rater ids. Per-rater severity on that wave waits on the rest of the ratings. The raw TSVs stay off this public repository.
+4. **Off-repo path for experiment 08's rerun.** The sha-pinned VeriBench experiment 100 `items.jsonl` (`ad9ed552fc2ffac6328e6010bf6be82215dd74f1eddd791622d433126877a96c`) is not in this repository. `scripts/analysis.py` exits if the sha does not match.
