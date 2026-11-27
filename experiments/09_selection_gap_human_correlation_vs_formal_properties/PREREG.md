@@ -102,3 +102,7 @@ No model is called. The 56 rows are judge LLMs on `vb103_judge` and judge agents
 ## Cost estimate
 
 `$0` out of pocket. API-equivalent `$0`. No plan lane is used.
+
+## Amendment 1 (2026-11-27, before any run): `V_fmt` has no rate interval in the CSV
+
+`judge_table.csv` stores `V_fmt` as a point estimate. The interval columns next to it belong to `fmt_mean_gap`, not to the `V_fmt` rate. `fail_count` therefore uses the five rates that have `value` and `ci_lo` in that CSV: `V_ms`, `V_weak`, `V_vac`, `V_overc`, `V_rep`. `V_fmt` stays inside `ATI_equal`, because that index uses the point estimate only. `idea1_fail` is unchanged (`V_weak` or `V_rep`). No selector was fit and no table of picks was computed before this amendment.
