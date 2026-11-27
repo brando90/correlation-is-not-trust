@@ -70,6 +70,12 @@ class TestPrimitives(unittest.TestCase):
         self.assertEqual(b1, b2)
         self.assertLessEqual(b1["ci_lo"], b1["value"])
         self.assertLessEqual(b1["value"], b1["ci_hi"])
+        vals_a = [v for _, v in pairs]
+        vals_b = [0.4] * len(pairs)
+        tids = [t for t, _ in pairs]
+        sf = A.paired_task_signflip_p(tids, vals_a, vals_b, draws=200, seed=A.SEED)
+        ci = A.cluster_mean_ci([(t, va - vb) for t, va, vb in zip(tids, vals_a, vals_b)], draws=200, seed=A.SEED)
+        self.assertAlmostEqual(sf["obs_diff"], ci["value"], places=12)
 
 
 class TestLoggedArtifacts(unittest.TestCase):
@@ -89,6 +95,10 @@ class TestLoggedArtifacts(unittest.TestCase):
         self.assertEqual(self.summary["part_b"]["verdict_h_idea3"], "supported")
         self.assertEqual(self.summary["part_c"]["verdict_h2_new"], "supported")
         self.assertEqual(len(self.summary["part_b"]["lomfo_folds"]), 6)
+        self.assertIn("lomfo_fold_summary", self.summary["part_b"])
+        for row in self.part_b_rows:
+            self.assertIn("ctl_rejected_trainval_q_of_4", row)
+            self.assertIn("q_const_tv_median_index", row)
 
     def test_ci_ordering_recursive(self):
         def walk(obj, path="root"):
@@ -150,6 +160,8 @@ class TestLoggedArtifacts(unittest.TestCase):
             self.assertNotIn(banned, blob)
 
     def test_results_md_quotes_canonical_lines_and_terms(self):
+        import re
+
         results_md = EXP / "RESULTS.md"
         if not results_md.exists():
             self.skipTest("RESULTS.md not yet written")
@@ -157,6 +169,14 @@ class TestLoggedArtifacts(unittest.TestCase):
         lines = (EXP / "results" / "canonical_lines.txt").read_text(encoding="utf-8").splitlines()
         missing = [ln for ln in lines if ln and ln not in body]
         self.assertEqual(missing, [])
+        for md_path in (EXP / "README.md", results_md):
+            md_txt = md_path.read_text(encoding="utf-8")
+            self.assertNotIn("github.com/brandomiranda/", md_txt, str(md_path))
+            for rel in re.findall(r"\[[^\]]+\]\(([^)#]+)\)", md_txt):
+                if rel.startswith(("http://", "https://", "file://", "mailto:")):
+                    continue
+                target = (md_path.parent / rel).resolve()
+                self.assertTrue(target.exists(), f"Broken relative link {rel} in {md_path}")
 
 
 if __name__ == "__main__":

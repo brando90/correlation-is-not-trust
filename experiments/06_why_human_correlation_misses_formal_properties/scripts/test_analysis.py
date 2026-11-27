@@ -8,6 +8,7 @@ import json
 import math
 import re
 import sys
+import tempfile
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -204,6 +205,28 @@ class TestApiScript(unittest.TestCase):
                 with redirect_stdout(buf):
                     with self.assertRaises(SystemExit):
                         J.main()
+
+    def test_parse_text_parse_scores_and_completed_batches(self):
+        ndjson = "\n".join([
+            json.dumps({"type": "assistant", "message": {"content": [{"type": "text", "text": '[{"item": 1, "score": 0.2}]'}]}}),
+            json.dumps({"type": "result", "result": 'notes [not json] then [{"item": 1, "score": 1.0}, {"item": 2, "score": 0.4}]'}),
+        ])
+        texts = J.parse_text(ndjson)
+        self.assertEqual(len(texts), 2)
+        parsed = J.parse_scores(texts, n_items=2)
+        self.assertEqual(parsed, {1: 1.0, 2: 0.4})
+        two_arrays = 'first [{"item": 9, "score": 0.1}] middle text second [{"item": 1, "score": 0.8}, {"item": 2, "score": 0.0}]'
+        self.assertEqual(J.parse_scores([two_arrays], n_items=2), {1: 0.8, 2: 0.0})
+        with tempfile.TemporaryDirectory() as tmp:
+            resf = Path(tmp) / "scores_I.jsonl"
+            resf.write_text(
+                "\n".join([
+                    json.dumps({"batch": 0, "probe_ids": ["p1", "p2"], "scores": {"p1": 1.0}}),
+                    json.dumps({"batch": 1, "probe_ids": ["p3", "p4"], "scores": {"p3": 1.0, "p4": 0.4}}),
+                ]) + "\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(J.completed_batches(resf), {1})
 
 
 class TestLoggedData(unittest.TestCase):

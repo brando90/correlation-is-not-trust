@@ -160,26 +160,47 @@ def parse_text(stdout: str) -> list[str]:
 
 
 def parse_scores(texts: list[str], n_items: int) -> dict[int, float]:
+    """Extract the last valid JSON list of {item, score} dicts using JSONDecoder.raw_decode."""
+    decoder = json.JSONDecoder()
     for text in reversed(texts):
-        match = re.search(r"\[\s*\{.*\}\s*\]", text, re.S)
-        if not match:
-            continue
-        try:
-            payload = json.loads(match.group(0))
-        except json.JSONDecodeError:
-            continue
-        found = {}
-        for obj in payload:
+        positions = [idx for idx, ch in enumerate(text) if ch == "["]
+        for pos in reversed(positions):
             try:
-                index = int(obj["item"])
-                score = float(obj["score"])
-            except (KeyError, TypeError, ValueError):
+                payload, _ = decoder.raw_decode(text, pos)
+            except json.JSONDecodeError:
                 continue
-            if 1 <= index <= n_items and 0.0 <= score <= 1.0:
-                found[index] = score
-        if found:
-            return found
+            if not isinstance(payload, list):
+                continue
+            found = {}
+            for obj in payload:
+                if not isinstance(obj, dict):
+                    continue
+                try:
+                    index = int(obj["item"])
+                    score = float(obj["score"])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                if 1 <= index <= n_items and 0.0 <= score <= 1.0:
+                    found[index] = score
+            if found:
+                return found
     return {}
+
+
+def completed_batches(resf: Path) -> set[int]:
+    """Return batch indices that have a full set of parsed scores."""
+    done: set[int] = set()
+    if not resf.exists():
+        return done
+    for line in resf.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        rec = json.loads(line)
+        probe_ids = rec.get("probe_ids") or []
+        scores = rec.get("scores") or {}
+        if probe_ids and len(scores) == len(probe_ids):
+            done.add(int(rec["batch"]))
+    return done
 
 
 def token_counts(receipt) -> dict:
@@ -265,11 +286,7 @@ def main():
     allowed = set(lanes)
     skip = ",".join(lane for lane in ALL_LANES if lane not in allowed)
     resf = out / "scores_I.jsonl"
-    done = set()
-    if resf.exists():
-        for line in resf.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                done.add(json.loads(line)["batch"])
+    done = completed_batches(resf)
     n_run = 0
     for bi, batch in enumerate(batches):
         if bi in done:

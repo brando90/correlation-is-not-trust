@@ -298,21 +298,23 @@ def paired_task_signflip_p(
     b = np.asarray(vals_b, dtype=float)
     t_arr = np.asarray(task_ids)
     uniq = sorted(set(t_arr))
-    cluster_diffs = np.array([float(np.mean(a[t_arr == t] - b[t_arr == t])) for t in uniq], dtype=float)
-    obs = float(np.mean(cluster_diffs))
-    g = len(uniq)
-    if g == 0:
+    n_total = float(len(a))
+    if not uniq or n_total <= 0:
         raise ValueError("Empty task_ids in paired_task_signflip_p")
+    # Item-count-weighted cluster sums so permutation test targets the exact item-weighted difference in cluster_mean_ci.
+    cluster_sums = np.array([float(np.sum(a[t_arr == t] - b[t_arr == t])) for t in uniq], dtype=float)
+    obs = float(np.sum(cluster_sums) / n_total)
+    g = len(uniq)
     if g <= 12:
         signs = np.array(list(itertools.product([-1.0, 1.0], repeat=g)), dtype=float)
-        perm_means = (signs @ cluster_diffs) / float(g)
+        perm_means = (signs @ cluster_sums) / n_total
         p_val = float(np.mean(np.abs(perm_means) >= abs(obs) - 1e-12))
         method = f"exact_2^{g}"
         n_perm = 2 ** g
     else:
         rng = np.random.default_rng(seed)
         signs = rng.choice([-1.0, 1.0], size=(draws, g))
-        perm_means = (signs @ cluster_diffs) / float(g)
+        perm_means = (signs @ cluster_sums) / n_total
         p_val = float((1 + np.sum(np.abs(perm_means) >= abs(obs) - 1e-12)) / (draws + 1))
         method = "mc_signflip"
         n_perm = draws
@@ -1021,8 +1023,24 @@ def analyze_part_a_and_b(
             fold_row[idx_name] = {"spearman": sp_f, "regret_rps": reg_f}
         lomfo_folds.append(fold_row)
 
+    lomfo_fold_summary: dict[str, Any] = {}
+    for idx_name in ("ATI_equal", "ATI_min", "ATI_cal_rps", "C_ms_gold", "1_minus_V_weak", "TI_var_trainnorm"):
+        valid_folds = [f for f in lomfo_folds if f[idx_name]["regret_rps"] is not None]
+        sps = [float(f[idx_name]["spearman"]) for f in valid_folds if f[idx_name]["spearman"] is not None]
+        regs = [(f["heldout_family"], float(f[idx_name]["regret_rps"])) for f in valid_folds]
+        max_fam, max_reg = max(regs, key=lambda kv: kv[1]) if regs else (None, None)
+        lomfo_fold_summary[idx_name] = {
+            "n_folds": len(valid_folds),
+            "mean_fold_spearman": float(np.mean(sps)) if sps else None,
+            "mean_fold_regret_rps": float(np.mean([rv for _, rv in regs])) if regs else None,
+            "max_fold_regret_rps": max_reg,
+            "max_fold_regret_family": max_fam,
+            "per_fold_regret_rps": {f["heldout_family"]: f[idx_name]["regret_rps"] for f in lomfo_folds},
+        }
+
     # Evaluate index table across splits (test n=18, test_unseen n=16, lomfo_oof n=56) and controls
     ctls = [r for r in records if r["kind"] == "control"]
+    q_const_rps_tv = [r for r in q_const_rps if r["split"] in ("train", "val")]
     index_defs = [
         ("ATI_equal", lambda r: r["ati_equal"], lambda r: r["ati_equal"]),
         ("ATI_min", lambda r: r["ati_min"], lambda r: r["ati_min"]),
@@ -1062,9 +1080,12 @@ def analyze_part_a_and_b(
             reg_ce = float(np.mean([r["proper"]["ce_cal_all5"]["ce"]["value"] for r in tied]) - best_ce_pool)
             reg_tvd = float(np.mean([r["proper"]["ce_cal_all5"]["tvd"]["value"] for r in tied]) - best_tvd_pool)
 
-            q_med_score = float(np.median([float(getter(r)) for r in q_const_rps if getter(r) is not None]))
-            ctl_scores = {c["config"]: (float(g_tv(c)) if g_tv(c) is not None else None) for c in ctls}
-            ctl_rejected = sum(1 for v in ctl_scores.values() if v is None or v < q_med_score - 1e-12)
+            # Keep preregistered full Q_const_rps cutoff, and add strictly leak-free train+val cutoff; evaluate both threshold & controls on matched g_tv scale.
+            q_med_score = float(np.median([float(g_tv(r)) for r in q_const_rps if g_tv(r) is not None]))
+            q_tv_med_score = float(np.median([float(g_tv(r)) for r in q_const_rps_tv if g_tv(r) is not None]))
+            ctl_scores_tv = {c["config"]: (float(g_tv(c)) if g_tv(c) is not None else None) for c in ctls}
+            ctl_rejected = sum(1 for v in ctl_scores_tv.values() if v is None or v < q_med_score - 1e-12)
+            ctl_rejected_tv = sum(1 for v in ctl_scores_tv.values() if v is None or v < q_tv_med_score - 1e-12)
             part_b_rows.append({
                 "split": split_name,
                 "index": idx_name,
@@ -1086,7 +1107,9 @@ def analyze_part_a_and_b(
                 "regret_tvd": reg_tvd,
                 "q_const_median_index": q_med_score,
                 "ctl_rejected_of_4": ctl_rejected,
-                "ctl_scores": ctl_scores,
+                "q_const_tv_median_index": q_tv_med_score,
+                "ctl_rejected_trainval_q_of_4": ctl_rejected_tv,
+                "ctl_scores": ctl_scores_tv,
             })
 
     gate_ctl_pass = sum(1 for c in ctls if c["gate_all_pass"])
@@ -1123,6 +1146,7 @@ def analyze_part_a_and_b(
         "gate_ctl_pass_count": gate_ctl_pass,
         "gate_real_pass_configs": gate_real_pass,
         "lomfo_folds": lomfo_folds,
+        "lomfo_fold_summary": lomfo_fold_summary,
         "verdict_h_idea3": verdict_idea3,
     }
 
@@ -1521,6 +1545,7 @@ def write_outputs(summary: dict[str, Any], records: list[dict[str, Any]], part_b
         "split", "index", "n", "rps_spearman", "rps_ci_lo", "rps_ci_hi", "rps_p", "rps_within_fam_p",
         "ce_spearman", "ce_p", "tvd_spearman", "tvd_p", "icc_spearman", "exp3_rho_spearman",
         "selected_configs", "regret_rps", "regret_ce", "regret_tvd", "q_const_median_index", "ctl_rejected_of_4",
+        "q_const_tv_median_index", "ctl_rejected_trainval_q_of_4",
     ]
     with (out_dir / "part_b_idea3_certification.csv").open("w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=b_fields, lineterminator="\n")
