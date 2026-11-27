@@ -80,3 +80,10 @@ From anonymized multiset CSVs (`human_ratings_old_11-24-2026.csv`, `75` items / 
 
 ## Cost estimate
 $0.00 (zero new model calls; CPU-only reanalysis).
+
+## Amendment (as of 2026-11-26, post-QA terminology & scope notes)
+
+Preserving lines 1–82 above intact, three methodological clarifications apply to reporting:
+1. **`TVD` terminology:** Among the three evaluation metrics, `RPS` and `CE` are strictly proper scoring rules for single rater outcomes, whereas `TVD` is a distribution distance against the multi-rater empirical distribution `p_emp` (hence excluded when scoring single-rater `LORO` outcomes).
+2. **Leak-free control cutoff vs. literal `median(Q_const_rps)`:** Alongside the literal `median(Q_const_rps)` (`n = 29`, which includes `11` test-split configs), the strictly leak-free `train+val`-only qualified cutoff (`n = 18`) and its corresponding preregistered (`falsified` at `3/4` for `ATI_equal`/`ATI_cal_rps`) and `ATI_min` extension (`supported` at `4/4`) verdicts are reported explicitly.
+3. **Pooled fitted `LOMFO-CV` OOF inference:** Pooled `lomfo_oof_all` Spearman for `ATI_cal_rps` is reported descriptively only (omitting fixed-prediction permutation p-values and CIs), while inferential evaluation uses fixed `ATI_equal`/`ATI_min`, held-out `test`/`test_unseen_weights`, and within-fold 6-fold `LOMFO-CV` stats.

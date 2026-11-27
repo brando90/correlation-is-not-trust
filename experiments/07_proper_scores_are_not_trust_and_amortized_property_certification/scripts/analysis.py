@@ -287,6 +287,47 @@ def cluster_mean_ci(pairs: Sequence[tuple[str, float]], draws: int = BOOT_DRAWS,
     }
 
 
+def cluster_ratio_ci(
+    triples: Sequence[tuple[str, float, float]],
+    draws: int = BOOT_DRAWS,
+    seed: int = SEED,
+) -> dict[str, Any]:
+    """Task-cluster bootstrap CI for a ratio sum(num) / sum(den) (e.g. rating-weighted P(r == 5))."""
+    if not triples:
+        return {"value": None, "ci_lo": None, "ci_hi": None, "n": 0, "n_tasks": 0, "n_ratings": 0, "finite_draws": 0}
+    groups: dict[str, tuple[float, float]] = {}
+    tot_num = 0.0
+    tot_den = 0.0
+    for task, num, den in triples:
+        fn, fd = float(num), float(den)
+        if not (math.isfinite(fn) and math.isfinite(fd)) or fd < 0.0:
+            raise ValueError(f"Invalid triple in cluster_ratio_ci for task={task!r}: {(num, den)!r}")
+        tot_num += fn
+        tot_den += fd
+        prev_n, prev_d = groups.get(str(task), (0.0, 0.0))
+        groups[str(task)] = (prev_n + fn, prev_d + fd)
+    keys = sorted(groups)
+    g_nums = np.array([groups[k][0] for k in keys], dtype=float)
+    g_dens = np.array([groups[k][1] for k in keys], dtype=float)
+    point = float(tot_num / tot_den)
+    rng = np.random.default_rng(seed)
+    boot = np.empty(draws, dtype=float)
+    n_keys = len(keys)
+    for d_idx in range(draws):
+        picks = rng.integers(0, n_keys, size=n_keys)
+        boot[d_idx] = float(np.sum(g_nums[picks]) / np.sum(g_dens[picks]))
+    lo, hi = np.percentile(boot, [2.5, 97.5])
+    return {
+        "value": point,
+        "ci_lo": float(lo),
+        "ci_hi": float(hi),
+        "n": len(triples),
+        "n_tasks": len(keys),
+        "n_ratings": int(round(tot_den)),
+        "finite_draws": len(boot),
+    }
+
+
 def paired_task_signflip_p(
     task_ids: Sequence[str],
     vals_a: Sequence[float],
@@ -823,6 +864,13 @@ def analyze_part_a_and_b(
             proper["raw_all5_spearman"] = raw_sp_all5
             proper["raw_exp3_spearman"] = raw_sp_exp3
             proper["ce_cal_all5"] = metric_bundle(ce_l5, const_losses_5, ho_r_all5)
+            proper["ce_cal_all5"]["n_heldout_items"] = len(ho_elig)
+            if len(ho_elig) < len(heldout_items):
+                loro_matched_s = leave_one_rater_out(ho_r_all5, ho_t_elig, draws=BOOT_DRAWS, seed=SEED)["smoothed"]
+            else:
+                loro_matched_s = loro_all5["smoothed"]
+            proper["ce_cal_all5"]["matched_loro_rps"] = float(loro_matched_s["rps"]["value"])
+            proper["ce_cal_all5"]["matched_loro_ce"] = float(loro_matched_s["ce"]["value"])
             proper["ce_cal_exp3"] = metric_bundle(ce_l3, const_losses_3, ho_r_exp3)
 
             # Calibrated-distribution axiomatic metrics (using ce_fn_5)
@@ -864,8 +912,8 @@ def analyze_part_a_and_b(
         beats_const_all3 = beats_const_rps and beats_const_ce and beats_const_tvd
         beats_loro_rps_ce = bool(
             beats_const_rps
-            and proper["ce_cal_all5"]["rps"]["value"] <= loro_all5["smoothed"]["rps"]["value"] + 1e-12
-            and proper["ce_cal_all5"]["ce"]["value"] <= loro_all5["smoothed"]["ce"]["value"] + 1e-12
+            and proper["ce_cal_all5"]["rps"]["value"] <= proper["ce_cal_all5"]["matched_loro_rps"] + 1e-12
+            and proper["ce_cal_all5"]["ce"]["value"] <= proper["ce_cal_all5"]["matched_loro_ce"] + 1e-12
         )
         beats_const_exp3_rps = bool(eligible and proper["ce_cal_exp3"]["d_rps_vs_const"]["ci_hi"] < 0.0)
 
@@ -1068,11 +1116,21 @@ def analyze_part_a_and_b(
             elig = [(r, getter(r)) for r in pool_rows if getter(r) is not None]
             xs = [float(v) for _, v in elig]
             fams = [r["base_model_family"] for r, _ in elig]
-            rps_assoc = unit_meta_corr(xs, [-r["proper"]["ce_cal_all5"]["rps"]["value"] for r, _ in elig], fams)
-            ce_assoc = unit_meta_corr(xs, [-r["proper"]["ce_cal_all5"]["ce"]["value"] for r, _ in elig], fams)
-            tvd_assoc = unit_meta_corr(xs, [-r["proper"]["ce_cal_all5"]["tvd"]["value"] for r, _ in elig], fams)
-            icc_assoc = unit_meta_corr(xs, [r["proper"]["ce_cal_all5"]["icc_a1"] for r, _ in elig], fams)
-            exp3_sp_assoc = unit_meta_corr(xs, [r["proper"]["raw_exp3_spearman"] for r, _ in elig], fams)
+            # Pooled fitted LOMFO OOF predictions depend on other folds' labels, so fixed-predictor CI/p-vals are invalid.
+            is_pooled_fitted = (split_name == "lomfo_oof_all" and idx_name == "ATI_cal_rps")
+
+            def _assoc(ys: Sequence[float]) -> dict[str, Any]:
+                if is_pooled_fitted:
+                    sp = spearman_corr(xs, ys)
+                    pe = pearson_corr(xs, ys)
+                    return {"spearman": sp, "pearson": pe, "ci_lo": None, "ci_hi": None, "p_val": None, "within_family_p": None}
+                return unit_meta_corr(xs, ys, fams)
+
+            rps_assoc = _assoc([-r["proper"]["ce_cal_all5"]["rps"]["value"] for r, _ in elig])
+            ce_assoc = _assoc([-r["proper"]["ce_cal_all5"]["ce"]["value"] for r, _ in elig])
+            tvd_assoc = _assoc([-r["proper"]["ce_cal_all5"]["tvd"]["value"] for r, _ in elig])
+            icc_assoc = _assoc([r["proper"]["ce_cal_all5"]["icc_a1"] for r, _ in elig])
+            exp3_sp_assoc = _assoc([r["proper"]["raw_exp3_spearman"] for r, _ in elig])
 
             best_idx = max(v for _, v in elig)
             tied = [r for r, v in elig if abs(v - best_idx) <= 1e-12]
@@ -1090,17 +1148,32 @@ def analyze_part_a_and_b(
                 "split": split_name,
                 "index": idx_name,
                 "n": len(elig),
+                "inference_mode": "descriptive_only_pooled_oof" if is_pooled_fitted else "valid_fixed_predictor",
                 "rps_spearman": rps_assoc["spearman"],
                 "rps_ci_lo": rps_assoc["ci_lo"],
                 "rps_ci_hi": rps_assoc["ci_hi"],
                 "rps_p": rps_assoc["p_val"],
                 "rps_within_fam_p": rps_assoc["within_family_p"],
                 "ce_spearman": ce_assoc["spearman"],
+                "ce_ci_lo": ce_assoc["ci_lo"],
+                "ce_ci_hi": ce_assoc["ci_hi"],
                 "ce_p": ce_assoc["p_val"],
+                "ce_within_fam_p": ce_assoc["within_family_p"],
                 "tvd_spearman": tvd_assoc["spearman"],
+                "tvd_ci_lo": tvd_assoc["ci_lo"],
+                "tvd_ci_hi": tvd_assoc["ci_hi"],
                 "tvd_p": tvd_assoc["p_val"],
+                "tvd_within_fam_p": tvd_assoc["within_family_p"],
                 "icc_spearman": icc_assoc["spearman"],
+                "icc_ci_lo": icc_assoc["ci_lo"],
+                "icc_ci_hi": icc_assoc["ci_hi"],
+                "icc_p": icc_assoc["p_val"],
+                "icc_within_fam_p": icc_assoc["within_family_p"],
                 "exp3_rho_spearman": exp3_sp_assoc["spearman"],
+                "exp3_rho_ci_lo": exp3_sp_assoc["ci_lo"],
+                "exp3_rho_ci_hi": exp3_sp_assoc["ci_hi"],
+                "exp3_rho_p": exp3_sp_assoc["p_val"],
+                "exp3_rho_within_fam_p": exp3_sp_assoc["within_family_p"],
                 "selected_configs": "|".join(r["config"] for r in tied),
                 "regret_rps": reg_rps,
                 "regret_ce": reg_ce,
@@ -1115,28 +1188,34 @@ def analyze_part_a_and_b(
     gate_ctl_pass = sum(1 for c in ctls if c["gate_all_pass"])
     gate_real_pass = [r["config"] for r in real_recs if r["gate_all_pass"]]
 
-    # H-Idea3 verdict per PREREG
+    # H-Idea3 verdict: preserve literal PREREG rule (full Q_const_rps) AND explicitly compute strictly leak-free (train+val Q) rule & ATI_min extension.
     te_by_idx = {r["index"]: r for r in part_b_rows if r["split"] == "test"}
-    idea3_supported = any(
-        te_by_idx[k]["rps_spearman"] is not None
-        and te_by_idx[k]["rps_spearman"] >= 0.50 - 1e-12
-        and te_by_idx[k]["rps_p"] < 0.05
-        and te_by_idx[k]["regret_rps"] <= 0.015 + 1e-12
-        and te_by_idx[k]["ctl_rejected_of_4"] == 4
-        and gate_ctl_pass == 0
-        for k in ("ATI_equal", "ATI_cal_rps")
-    )
-    idea3_falsified = (
-        all(
-            te_by_idx[k]["rps_spearman"] is None
-            or te_by_idx[k]["rps_spearman"] < 0.30
-            or te_by_idx[k]["rps_p"] >= 0.10
-            for k in ("ATI_equal", "ATI_cal_rps")
+
+    def _idea3_rule(ctl_key: str, cands: tuple[str, ...]) -> str:
+        supp = any(
+            te_by_idx[k]["rps_spearman"] is not None
+            and te_by_idx[k]["rps_spearman"] >= 0.50 - 1e-12
+            and te_by_idx[k]["rps_p"] < 0.05
+            and te_by_idx[k]["regret_rps"] <= 0.015 + 1e-12
+            and te_by_idx[k][ctl_key] == 4
+            and gate_ctl_pass == 0
+            for k in cands
         )
-        or max(te_by_idx["ATI_equal"]["ctl_rejected_of_4"], te_by_idx["ATI_cal_rps"]["ctl_rejected_of_4"]) < 4
-        or gate_ctl_pass > 0
-    )
-    verdict_idea3 = "supported" if idea3_supported else ("falsified" if idea3_falsified else "mixed")
+        fals = (
+            all(
+                te_by_idx[k]["rps_spearman"] is None
+                or te_by_idx[k]["rps_spearman"] < 0.30
+                or te_by_idx[k]["rps_p"] >= 0.10
+                for k in cands
+            )
+            or max(te_by_idx[k][ctl_key] for k in cands) < 4
+            or gate_ctl_pass > 0
+        )
+        return "supported" if supp else ("falsified" if fals else "mixed")
+
+    verdict_idea3 = _idea3_rule("ctl_rejected_of_4", ("ATI_equal", "ATI_cal_rps"))
+    verdict_idea3_leak_free = _idea3_rule("ctl_rejected_trainval_q_of_4", ("ATI_equal", "ATI_cal_rps"))
+    verdict_idea3_ext_min = _idea3_rule("ctl_rejected_trainval_q_of_4", ("ATI_min",))
 
     part_b_summary = {
         "ati_cal_weights": dict(zip(ATI_FEATURES, [float(x) for x in w_tv])),
@@ -1148,6 +1227,9 @@ def analyze_part_a_and_b(
         "lomfo_folds": lomfo_folds,
         "lomfo_fold_summary": lomfo_fold_summary,
         "verdict_h_idea3": verdict_idea3,
+        "verdict_h_idea3_prereg_literal": verdict_idea3,
+        "verdict_h_idea3_leak_free_prereg": verdict_idea3_leak_free,
+        "verdict_h_idea3_leak_free_extension_ati_min": verdict_idea3_ext_min,
     }
 
     alignment = {
@@ -1178,7 +1260,9 @@ def analyze_part_c_human_regimes() -> dict[str, Any]:
             item_ratings.append(rats)
             tasks.append(str(r["task"]))
 
-        # Individual rating distribution (task-clustered over items)
+        # Individual rating distribution (prespecified rating-weighted via task-cluster ratio, plus item-weighted sensitivity)
+        rat_p5_triples = [(t, float(sum(1 for v in rats if v == 5)), float(len(rats))) for t, rats in zip(tasks, item_ratings)]
+        rat_p45_triples = [(t, float(sum(1 for v in rats if v >= 4)), float(len(rats))) for t, rats in zip(tasks, item_ratings)]
         p5_pairs = [(t, sum(1 for v in rats if v == 5) / len(rats)) for t, rats in zip(tasks, item_ratings)]
         p45_pairs = [(t, sum(1 for v in rats if v >= 4) / len(rats)) for t, rats in zip(tasks, item_ratings)]
         all_rats = [v for rats in item_ratings for v in rats]
@@ -1226,6 +1310,8 @@ def analyze_part_c_human_regimes() -> dict[str, Any]:
             "mean_ratings_per_item": len(all_rats) / len(item_ratings),
             "raw_p_eq_5": raw_p5,
             "raw_p_ge_4": raw_p45,
+            "rating_weighted_p_eq_5": cluster_ratio_ci(rat_p5_triples, draws=BOOT_DRAWS, seed=SEED),
+            "rating_weighted_p_ge_4": cluster_ratio_ci(rat_p45_triples, draws=BOOT_DRAWS, seed=SEED),
             "item_weighted_p_eq_5": cluster_mean_ci(p5_pairs, draws=BOOT_DRAWS, seed=SEED),
             "item_weighted_p_ge_4": cluster_mean_ci(p45_pairs, draws=BOOT_DRAWS, seed=SEED),
             "unanimous_range_0": cluster_mean_ci(unanimous_pairs, draws=BOOT_DRAWS, seed=SEED),
@@ -1250,7 +1336,7 @@ def analyze_part_c_human_regimes() -> dict[str, Any]:
         }
 
     new_d = datasets["new_vb"]
-    p5_blk = new_d["item_weighted_p_eq_5"]
+    p5_blk = new_d["rating_weighted_p_eq_5"]
     nc_blk = new_d["non_ceiling_range_ge_1"]
     if (
         p5_blk["value"] >= 0.65 - 1e-12
@@ -1286,9 +1372,9 @@ def canonical_lines(summary: dict[str, Any]) -> list[str]:
     new_d = pc["datasets"]["new_vb"]
     lines = [
         f"VERDICT_H1_PROPER {pa['verdict_h1_proper']} q_const_rps={pa['n_q_const_rps']} q_const_rps_fail={pa['n_q_const_rps_fail_nonbug']} q_const_all3={pa['n_q_const_all3']} q_const_all3_fail={pa['n_q_const_all3_fail_nonbug']} q_loro={pa['n_q_loro_rps']} q_loro_fail={pa['n_q_loro_rps_fail_nonbug']}",
-        f"VERDICT_H_IDEA3 {pb['verdict_h_idea3']} ati_equal_test_sp={te_rows['ATI_equal']['rps_spearman']:.3f} p={te_rows['ATI_equal']['rps_p']:.4f} reg_rps={te_rows['ATI_equal']['regret_rps']:.4f} ati_cal_test_sp={te_rows['ATI_cal_rps']['rps_spearman']:.3f} p={te_rows['ATI_cal_rps']['rps_p']:.4f} reg_rps={te_rows['ATI_cal_rps']['regret_rps']:.4f} ctl_reject={te_rows['ATI_equal']['ctl_rejected_of_4']}/4 gate_ctl_pass={pb['gate_ctl_pass_count']}/4",
-        f"LOMFO_OOF ati_equal_sp={oo_rows['ATI_equal']['rps_spearman']:.3f} p={oo_rows['ATI_equal']['rps_p']:.4f} ati_cal_sp={oo_rows['ATI_cal_rps']['rps_spearman']:.3f} p={oo_rows['ATI_cal_rps']['rps_p']:.4f} ati_min_sp={oo_rows['ATI_min']['rps_spearman']:.3f} cms_sp={oo_rows['C_ms_gold']['rps_spearman']:.3f}",
-        f"VERDICT_H2_NEW {pc['verdict_h2_new']} new_p5={fmt_ci(new_d['item_weighted_p_eq_5'])} new_nonceil_disag={fmt_ci(new_d['non_ceiling_range_ge_1'])} n_nonceil={new_d['non_ceiling_n_items']}/{new_d['n_items']} old_p5={fmt_ci(old_d['item_weighted_p_eq_5'])} old_nonceil_disag={fmt_ci(old_d['non_ceiling_range_ge_1'])}",
+        f"VERDICT_H_IDEA3 prereg_literal={pb['verdict_h_idea3_prereg_literal']} leak_free_prereg={pb['verdict_h_idea3_leak_free_prereg']} extension_ati_min={pb['verdict_h_idea3_leak_free_extension_ati_min']} ati_equal_test_sp={te_rows['ATI_equal']['rps_spearman']:.3f} p={te_rows['ATI_equal']['rps_p']:.4f} reg_rps={te_rows['ATI_equal']['regret_rps']:.4f} ati_cal_test_sp={te_rows['ATI_cal_rps']['rps_spearman']:.3f} p={te_rows['ATI_cal_rps']['rps_p']:.4f} reg_rps={te_rows['ATI_cal_rps']['regret_rps']:.4f} ctl_full_q={te_rows['ATI_equal']['ctl_rejected_of_4']}/4 ctl_tv_q={te_rows['ATI_equal']['ctl_rejected_trainval_q_of_4']}/4 ctl_ati_min_tv_q={te_rows['ATI_min']['ctl_rejected_trainval_q_of_4']}/4 gate_ctl_pass={pb['gate_ctl_pass_count']}/4",
+        f"LOMFO_OOF ati_equal_sp={oo_rows['ATI_equal']['rps_spearman']:.3f} p={oo_rows['ATI_equal']['rps_p']:.4f} ati_min_sp={oo_rows['ATI_min']['rps_spearman']:.3f} p={oo_rows['ATI_min']['rps_p']:.4f} ati_cal_sp={oo_rows['ATI_cal_rps']['rps_spearman']:.3f} (descriptive) cms_sp={oo_rows['C_ms_gold']['rps_spearman']:.3f} p={oo_rows['C_ms_gold']['rps_p']:.4f}",
+        f"VERDICT_H2_NEW {pc['verdict_h2_new']} new_p5_rating={fmt_ci(new_d['rating_weighted_p_eq_5'])} new_nonceil_disag={fmt_ci(new_d['non_ceiling_range_ge_1'])} n_nonceil={new_d['non_ceiling_n_items']}/{new_d['n_items']} old_p5_rating={fmt_ci(old_d['rating_weighted_p_eq_5'])} old_nonceil_disag={fmt_ci(old_d['non_ceiling_range_ge_1'])}",
         f"ALIGN a1_checks={al['gate_a1_e68_checks']} a1_max_diff={al['gate_a1_e68_max_abs_diff']:.2e} a2_checks={al['gate_a2_exp03_checks']} a2_max_diff={al['gate_a2_exp03_max_abs_diff']:.2e}",
     ]
     return lines
@@ -1361,7 +1447,7 @@ def plot_fig1(path: Path, records: list[dict[str, Any]], pa: dict[str, Any]) -> 
     ax2.grid(True)
     ax2.legend(loc="lower right", fontsize=8, framealpha=0.92)
 
-    fig.suptitle("Experiment 07 (11-26-2026): Proper-Score Alignment (RPS, CE, TVD) Does Not Guarantee Axiomatic Trust", fontsize=12, fontweight="bold")
+    fig.suptitle("Experiment 07 (11-26-2026): Proper Scores (RPS, CE) & TVD Distance Do Not Guarantee Axiomatic Trust", fontsize=12, fontweight="bold")
     fig.tight_layout(rect=[0, 0, 1, 0.94])
     fig.savefig(path, dpi=160)
     plt.close(fig)
@@ -1375,7 +1461,7 @@ def plot_fig2(path: Path, records: list[dict[str, Any]], part_b_rows: list[dict[
     ax1.scatter(
         [r["ati_equal"] for r in te_real],
         [r["proper"]["ce_cal_all5"]["rps"]["value"] for r in te_real],
-        c="#2563eb", marker="o", s=65, label="Held-out test configs (ATI_equal)", edgecolors="black", linewidths=0.4,
+        c="#2563eb", marker="o", s=65, label="Canonical test split (n=18; 16 unseen-weight)", edgecolors="black", linewidths=0.4,
     )
     ax1.scatter(
         [r["e39_indices"]["C_ms_gold"] for r in ctls if r["e39_indices"].get("C_ms_gold") is not None],
@@ -1417,19 +1503,19 @@ def plot_fig2(path: Path, records: list[dict[str, Any]], part_b_rows: list[dict[
     w = 0.36
     oo_vals = [oo_map[k]["rps_spearman"] for k in order_idx]
     te_vals = [te_map[k]["rps_spearman"] for k in order_idx]
-    ax2.bar(x - w / 2, oo_vals, width=w, color="#2563eb", label="6-fold LOMFO-CV OOF (n=56)")
-    ax2.bar(x + w / 2, te_vals, width=w, color="#10b981", label="Held-out test split (n=18)")
+    ax2.bar(x - w / 2, oo_vals, width=w, color="#2563eb", label="6-fold LOMFO-CV OOF (n=56, zero weight overlap)")
+    ax2.bar(x + w / 2, te_vals, width=w, color="#10b981", label="Canonical test split (n=18; 16 unseen-weight)")
     ax2.axhline(0.0, color="black", linewidth=0.9)
     ax2.axhline(0.50, color="#047857", linestyle="--", linewidth=1.0, label="PREREG target (0.50)")
     ax2.set_xticks(x)
     ax2.set_xticklabels([k.replace("_trainnorm", "") for k in order_idx], rotation=24, ha="right", fontsize=8.5)
-    ax2.set_ylabel("Out-of-family Spearman with -CE_fit RPS")
-    ax2.set_title("Out-of-Family Prediction of Proper-Score Alignment")
-    ax2.set_ylim(-0.45, 1.0)
+    ax2.set_ylabel("Spearman with -CE_fit RPS")
+    ax2.set_title("Property-Index Generalization & Control Rejection")
+    ax2.set_ylim(-0.45, 1.15)
     ax2.grid(True)
     ax2.legend(loc="upper right", fontsize=8, framealpha=0.92)
 
-    fig.suptitle("Experiment 07 (11-26-2026): Idea 3 Out-of-Family Property Certification & Control Rejection", fontsize=12, fontweight="bold")
+    fig.suptitle("Experiment 07 (11-26-2026): Idea 3 Property-Index Generalization & Control Rejection", fontsize=12, fontweight="bold")
     fig.tight_layout(rect=[0, 0, 1, 0.94])
     fig.savefig(path, dpi=160)
     plt.close(fig)
@@ -1455,8 +1541,8 @@ def plot_fig3(path: Path, pc: dict[str, Any]) -> None:
     ax1.legend(loc="upper left", fontsize=8.5, framealpha=0.92)
 
     labels = ["All items:\nrange >= 1", "All items:\nrange >= 2", "Non-ceiling\n(min<5): range>=1", "Non-ceiling\n(min<5): range>=2", "Ceiling share\nP(r == 5)"]
-    old_blks = [old_d["range_ge_1"], old_d["range_ge_2"], old_d["non_ceiling_range_ge_1"], old_d["non_ceiling_range_ge_2"], old_d["item_weighted_p_eq_5"]]
-    new_blks = [new_d["range_ge_1"], new_d["range_ge_2"], new_d["non_ceiling_range_ge_1"], new_d["non_ceiling_range_ge_2"], new_d["item_weighted_p_eq_5"]]
+    old_blks = [old_d["range_ge_1"], old_d["range_ge_2"], old_d["non_ceiling_range_ge_1"], old_d["non_ceiling_range_ge_2"], old_d["rating_weighted_p_eq_5"]]
+    new_blks = [new_d["range_ge_1"], new_d["range_ge_2"], new_d["non_ceiling_range_ge_1"], new_d["non_ceiling_range_ge_2"], new_d["rating_weighted_p_eq_5"]]
     x = np.arange(len(labels))
     old_v = [b["value"] for b in old_blks]
     old_err = [[b["value"] - b["ci_lo"] for b in old_blks], [b["ci_hi"] - b["value"] for b in old_blks]]
@@ -1485,7 +1571,8 @@ def write_outputs(summary: dict[str, Any], records: list[dict[str, Any]], part_b
     # Part A CSV (60 units)
     a_fields = [
         "config", "kind", "harness", "family", "base_model_family", "split", "model_declared", "model_served",
-        "rho_heldout_exp3", "eligible", "beats_const_rps", "beats_const_all3", "beats_loro_rps_ce",
+        "rho_heldout_exp3", "eligible", "n_heldout_items", "beats_const_rps", "beats_const_all3", "beats_loro_rps_ce",
+        "matched_loro_rps", "matched_loro_ce",
         "raw_all5_rps", "ce_cal_all5_rps", "d_rps_vs_const", "d_rps_ci_lo", "d_rps_ci_hi", "d_rps_p",
         "ce_cal_all5_ce", "d_ce_p", "ce_cal_all5_tvd", "d_tvd_p", "ce_cal_all5_icc_a1", "ce_cal_all5_spearman",
         "V_ms", "V_weak", "V_weak_cal", "V_vac", "V_overc", "V_overc_cal", "V_fmt", "V_fmt_cal", "fmt_cal_tvd",
@@ -1504,8 +1591,10 @@ def write_outputs(summary: dict[str, Any], records: list[dict[str, Any]], part_b
                 "base_model_family": r["base_model_family"], "split": r["split"],
                 "model_declared": r["model_declared"], "model_served": r["model_served"],
                 "rho_heldout_exp3": r["rho_heldout_exp3"], "eligible": r["eligible"],
+                "n_heldout_items": c5.get("n_heldout_items"),
                 "beats_const_rps": r["beats_const_rps"], "beats_const_all3": r["beats_const_all3"],
                 "beats_loro_rps_ce": r["beats_loro_rps_ce"],
+                "matched_loro_rps": c5.get("matched_loro_rps"), "matched_loro_ce": c5.get("matched_loro_ce"),
                 "raw_all5_rps": r["proper"].get("raw_all5_rps"),
                 "ce_cal_all5_rps": c5.get("rps", {}).get("value"),
                 "d_rps_vs_const": c5.get("d_rps_vs_const", {}).get("value"),
@@ -1542,8 +1631,12 @@ def write_outputs(summary: dict[str, Any], records: list[dict[str, Any]], part_b
 
     # Part B CSV
     b_fields = [
-        "split", "index", "n", "rps_spearman", "rps_ci_lo", "rps_ci_hi", "rps_p", "rps_within_fam_p",
-        "ce_spearman", "ce_p", "tvd_spearman", "tvd_p", "icc_spearman", "exp3_rho_spearman",
+        "split", "index", "n", "inference_mode",
+        "rps_spearman", "rps_ci_lo", "rps_ci_hi", "rps_p", "rps_within_fam_p",
+        "ce_spearman", "ce_ci_lo", "ce_ci_hi", "ce_p", "ce_within_fam_p",
+        "tvd_spearman", "tvd_ci_lo", "tvd_ci_hi", "tvd_p", "tvd_within_fam_p",
+        "icc_spearman", "icc_ci_lo", "icc_ci_hi", "icc_p", "icc_within_fam_p",
+        "exp3_rho_spearman", "exp3_rho_ci_lo", "exp3_rho_ci_hi", "exp3_rho_p", "exp3_rho_within_fam_p",
         "selected_configs", "regret_rps", "regret_ce", "regret_tvd", "q_const_median_index", "ctl_rejected_of_4",
         "q_const_tv_median_index", "ctl_rejected_trainval_q_of_4",
     ]
@@ -1560,6 +1653,7 @@ def write_outputs(summary: dict[str, Any], records: list[dict[str, Any]], part_b
         w.writeheader()
         for ds_name, ds in summary["part_c"]["datasets"].items():
             for mname in (
+                "rating_weighted_p_eq_5", "rating_weighted_p_ge_4",
                 "item_weighted_p_eq_5", "item_weighted_p_ge_4", "unanimous_range_0", "range_ge_1", "range_ge_2",
                 "mean_range", "mean_sd", "pairwise_exact_agree", "irreducible_rps_floor",
                 "non_ceiling_range_ge_1", "non_ceiling_range_ge_2", "non_ceiling_mean_range", "non_ceiling_pairwise_exact",

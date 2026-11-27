@@ -217,16 +217,23 @@ class TestApiScript(unittest.TestCase):
         self.assertEqual(parsed, {1: 1.0, 2: 0.4})
         two_arrays = 'first [{"item": 9, "score": 0.1}] middle text second [{"item": 1, "score": 0.8}, {"item": 2, "score": 0.0}]'
         self.assertEqual(J.parse_scores([two_arrays], n_items=2), {1: 0.8, 2: 0.0})
+        malformed_float_bool = 'bad1 [{"item": 1.9, "score": 0.5}] bad2 [{"item": 1, "score": true}] bad3 [{"item": 1, "score": 0.5}, {"item": 1, "score": 0.6}]'
+        self.assertEqual(J.parse_scores([malformed_float_bool], n_items=2), {})
+        sha = "abc123"
+        batches = [["p1", "p2"], ["p3", "p4"]]
         with tempfile.TemporaryDirectory() as tmp:
             resf = Path(tmp) / "scores_I.jsonl"
             resf.write_text(
                 "\n".join([
-                    json.dumps({"batch": 0, "probe_ids": ["p1", "p2"], "scores": {"p1": 1.0}}),
-                    json.dumps({"batch": 1, "probe_ids": ["p3", "p4"], "scores": {"p3": 1.0, "p4": 0.4}}),
+                    json.dumps({"batch": 0, "rubric_sha256": sha, "probe_ids": ["p1", "p2"], "scores": {"p1": 1.0}}),
+                    json.dumps({"batch": 0, "rubric_sha256": sha, "probe_ids": ["p1", "p2"], "scores": {"wrong_a": 1.0, "wrong_b": 0.5}}),
+                    json.dumps({"batch": 1, "rubric_sha256": "stale", "probe_ids": ["p3", "p4"], "scores": {"p3": 1.0, "p4": 0.4}}),
+                    json.dumps({"batch": 1, "rubric_sha256": sha, "probe_ids": ["p3", "p4"], "scores": {"p3": True, "p4": 0.4}}),
+                    json.dumps({"batch": 1, "rubric_sha256": sha, "probe_ids": ["p3", "p4"], "scores": {"p3": 1.0, "p4": 0.4}}),
                 ]) + "\n",
                 encoding="utf-8",
             )
-            self.assertEqual(J.completed_batches(resf), {1})
+            self.assertEqual(J.completed_batches(resf, batches=batches, expected_rubric_sha=sha), {1})
 
 
 class TestLoggedData(unittest.TestCase):
@@ -245,7 +252,7 @@ class TestLoggedData(unittest.TestCase):
             self.report["verdicts"]["h_split"],
         ))
         self.assertEqual(self.report["arm_i"]["status"], "not_run")
-        self.assertEqual(self.report["new_model_calls"], 0)
+        self.assertEqual(self.report["cpu_analysis_new_model_calls"], 0)
         self.assertLess(self.report["exp03"]["spearman_abs_diff"], 1e-6)
         self.assertEqual(self.report["exp03"]["n_high"], 22)
         for key in A.CONFIG_ORDER:

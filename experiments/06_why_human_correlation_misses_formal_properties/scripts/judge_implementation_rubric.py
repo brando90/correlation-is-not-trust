@@ -25,6 +25,7 @@ import collections
 import csv
 import hashlib
 import json
+import math
 import random
 import re
 import subprocess
@@ -159,6 +160,10 @@ def parse_text(stdout: str) -> list[str]:
     return texts
 
 
+def _is_valid_score(raw: object) -> bool:
+    return isinstance(raw, (int, float)) and not isinstance(raw, bool) and math.isfinite(float(raw)) and 0.0 <= float(raw) <= 1.0
+
+
 def parse_scores(texts: list[str], n_items: int) -> dict[int, float]:
     """Extract the last valid JSON list of {item, score} dicts using JSONDecoder.raw_decode."""
     decoder = json.JSONDecoder()
@@ -169,26 +174,37 @@ def parse_scores(texts: list[str], n_items: int) -> dict[int, float]:
                 payload, _ = decoder.raw_decode(text, pos)
             except json.JSONDecodeError:
                 continue
-            if not isinstance(payload, list):
+            if not isinstance(payload, list) or not payload:
                 continue
-            found = {}
+            found: dict[int, float] = {}
+            bad = False
             for obj in payload:
-                if not isinstance(obj, dict):
-                    continue
-                try:
-                    index = int(obj["item"])
-                    score = float(obj["score"])
-                except (KeyError, TypeError, ValueError):
-                    continue
-                if 1 <= index <= n_items and 0.0 <= score <= 1.0:
-                    found[index] = score
-            if found:
+                if not isinstance(obj, dict) or "item" not in obj or "score" not in obj:
+                    bad = True
+                    break
+                raw_item = obj["item"]
+                raw_score = obj["score"]
+                if isinstance(raw_item, bool) or not isinstance(raw_item, int):
+                    bad = True
+                    break
+                if not _is_valid_score(raw_score):
+                    bad = True
+                    break
+                if not (1 <= raw_item <= n_items) or raw_item in found:
+                    bad = True
+                    break
+                found[raw_item] = float(raw_score)
+            if not bad and found:
                 return found
     return {}
 
 
-def completed_batches(resf: Path) -> set[int]:
-    """Return batch indices that have a full set of parsed scores."""
+def completed_batches(
+    resf: Path,
+    batches: list[list[str]] | None = None,
+    expected_rubric_sha: str | None = None,
+) -> set[int]:
+    """Return batch indices that match batch identity, rubric hash, and complete valid score records."""
     done: set[int] = set()
     if not resf.exists():
         return done
@@ -196,10 +212,23 @@ def completed_batches(resf: Path) -> set[int]:
         if not line.strip():
             continue
         rec = json.loads(line)
+        bi = rec.get("batch")
+        if isinstance(bi, bool) or not isinstance(bi, int):
+            continue
         probe_ids = rec.get("probe_ids") or []
         scores = rec.get("scores") or {}
-        if probe_ids and len(scores) == len(probe_ids):
-            done.add(int(rec["batch"]))
+        if not isinstance(probe_ids, list) or not probe_ids or not isinstance(scores, dict):
+            continue
+        if expected_rubric_sha is not None and rec.get("rubric_sha256") != expected_rubric_sha:
+            continue
+        if batches is not None:
+            if not (0 <= bi < len(batches)) or probe_ids != batches[bi]:
+                continue
+        if set(scores.keys()) != set(probe_ids):
+            continue
+        if not all(_is_valid_score(v) for v in scores.values()):
+            continue
+        done.add(bi)
     return done
 
 
@@ -283,10 +312,11 @@ def main():
     if len(byid) != len(kept):
         raise SystemExit("duplicate probe_id in property rows")
     batches = make_batches(kept)
+    rubric_sha = hashlib.sha256(RUBRIC_I.encode("utf-8")).hexdigest()
     allowed = set(lanes)
     skip = ",".join(lane for lane in ALL_LANES if lane not in allowed)
     resf = out / "scores_I.jsonl"
-    done = completed_batches(resf)
+    done = completed_batches(resf, batches=batches, expected_rubric_sha=rubric_sha)
     n_run = 0
     for bi, batch in enumerate(batches):
         if bi in done:

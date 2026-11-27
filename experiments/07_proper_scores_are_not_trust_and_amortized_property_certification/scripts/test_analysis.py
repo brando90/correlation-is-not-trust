@@ -94,11 +94,28 @@ class TestLoggedArtifacts(unittest.TestCase):
         self.assertEqual(self.summary["part_a"]["verdict_h1_proper"], "supported")
         self.assertEqual(self.summary["part_b"]["verdict_h_idea3"], "supported")
         self.assertEqual(self.summary["part_c"]["verdict_h2_new"], "supported")
-        self.assertEqual(len(self.summary["part_b"]["lomfo_folds"]), 6)
-        self.assertIn("lomfo_fold_summary", self.summary["part_b"])
+        pb = self.summary["part_b"]
+        self.assertEqual(pb["verdict_h_idea3_prereg_literal"], "supported")
+        self.assertEqual(pb["verdict_h_idea3_leak_free_prereg"], "falsified")
+        self.assertEqual(pb["verdict_h_idea3_leak_free_extension_ati_min"], "supported")
+        self.assertEqual(len(pb["lomfo_folds"]), 6)
+        self.assertIn("lomfo_fold_summary", pb)
         for row in self.part_b_rows:
             self.assertIn("ctl_rejected_trainval_q_of_4", row)
             self.assertIn("q_const_tv_median_index", row)
+            if row["split"] == "lomfo_oof_all" and row["index"] == "ATI_cal_rps":
+                self.assertEqual(row["inference_mode"], "descriptive_only_pooled_oof")
+                self.assertIsNone(row["rps_p"])
+                self.assertIsNone(row["rps_ci_lo"])
+                self.assertIsNone(row["rps_within_fam_p"])
+            else:
+                self.assertEqual(row["inference_mode"], "valid_fixed_predictor")
+                self.assertIsNotNone(row["ce_ci_lo"])
+                self.assertIsNotNone(row["tvd_within_fam_p"])
+        for ds in self.summary["part_c"]["datasets"].values():
+            r5 = ds["rating_weighted_p_eq_5"]
+            self.assertLessEqual(r5["ci_lo"], r5["value"])
+            self.assertLessEqual(r5["value"], r5["ci_hi"])
 
     def test_ci_ordering_recursive(self):
         def walk(obj, path="root"):

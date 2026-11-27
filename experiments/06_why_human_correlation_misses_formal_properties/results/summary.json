@@ -1,8 +1,8 @@
 {
   "date": "2026-11-26",
   "experiment": "06_why_human_correlation_misses_formal_properties",
-  "cost_usd": 0.0,
-  "new_model_calls": 0,
+  "cpu_analysis_cost_usd": 0.0,
+  "cpu_analysis_new_model_calls": 0,
   "seed": 20261124,
   "draws": 2000,
   "perm_draws": 5000,
@@ -1720,6 +1720,13 @@
     "status": "scored",
     "model_id": "claude-opus-5-5",
     "lane": "vals-claude-opus",
+    "arm_i_call_meta": {
+      "batches_run": 21,
+      "probes_scored": 123,
+      "extra_charge_usd": 0.0,
+      "lane": "vals-claude-opus",
+      "model_id": "claude-opus-5-5"
+    },
     "n_by_kind": {
       "BUG": 37,
       "ID1": 24,
